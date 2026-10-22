@@ -1,0 +1,11 @@
+ROTEIRIZZE TORNEIOS V3
+
+Extraia todo o ZIP. Abra admin.html.
+
+Criar competição (nome e quadras) > Criar categoria > Cadastrar duplas > Sortear e abrir chaveamento.
+
+Escolha os jogos manualmente. Para ausência, registre W.O. e selecione a dupla vencedora.
+
+Abra LEIA-ME.html para o guia de uso.
+
+Os dados ficam no navegador. Esta versão não sincroniza aparelhos e não tem senha. Para duas abas compartilharem os dados, use a mesma origem HTTP no mesmo navegador. O guia explica o teste local.
