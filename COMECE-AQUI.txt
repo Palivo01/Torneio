@@ -1,4 +1,4 @@
-ROTEIRIZZE TORNEIOS V3
+ROTEIRIZZE TORNEIOS V3.1
 
 Extraia todo o ZIP. Abra admin.html.
 
@@ -9,3 +9,8 @@ Escolha os jogos manualmente. Para ausência, registre W.O. e selecione a dupla 
 Abra LEIA-ME.html para o guia de uso.
 
 Os dados ficam no navegador. Esta versão não sincroniza aparelhos e não tem senha. Para duas abas compartilharem os dados, use a mesma origem HTTP no mesmo navegador. O guia explica o teste local.
+
+PUBLICAÇÃO
+Substitua os arquivos da versão anterior pelo conteúdo completo deste ZIP. Inclua routing.js, que permite abrir o painel tanto por /admin quanto por /admin.html.
+
+Os backups V3 e os dados da versão anterior no mesmo navegador e endereço continuam compatíveis.

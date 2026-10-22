@@ -1,5 +1,5 @@
 'use strict';
-const A=Arena,KEY='roteirizze-torneios-v3',params=new URLSearchParams(location.search),page=location.pathname.split('/').pop()||'index.html';
+const A=Arena,KEY='roteirizze-torneios-v3',params=new URLSearchParams(location.search),page=typeof SiteRouting!=='undefined'?SiteRouting.pageFromPath(location.pathname):((location.pathname.replace(/\/+$/,'').split('/').pop()||'index').toLowerCase().replace(/\.html$/,'')+'.html');
 const isAdmin=['admin.html','inscricoes.html'].includes(page)||(page==='chaveamento.html'&&params.get('admin')==='1');
 let registrationDraft=[];
 let comp=A.fresh(),storageError='',selected=params.get('categoria')||'',filter='all',query='',publicView='games',lane='W';
