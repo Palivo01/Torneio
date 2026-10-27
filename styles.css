@@ -26,9 +26,24 @@
 .bracket-fullscreen .bracket-surface{margin-left:auto;margin-right:auto}
 
 /* Duplas eliminadas: indicação visual derivada dos resultados. */
-.team-row.eliminated,.team-row.win.eliminated,.roster-team.eliminated{background:#3b202a;border-color:#a74a59;color:#ffb3bc;box-shadow:inset 3px 0 #ff687c}
-.team-row.eliminated>span,.roster-team.eliminated strong{color:#ffb3bc}
+.team-row.eliminated,.team-row.win.eliminated{background:#3b202a;border-color:#a74a59;color:#ffb3bc;box-shadow:inset 3px 0 #ff687c}
+.team-row.eliminated>span{color:#ffb3bc}
 .eliminated-label{display:block;font-size:9px;line-height:1.25;font-weight:700;color:#ff91a0;margin-top:3px}
-.roster-team.eliminated small.eliminated-label{color:#ff91a0;font-size:10px}
+
 .team-row.eliminated .match-source{color:#c997a0}
-@media print{.team-row.eliminated,.roster-team.eliminated{border-left:3px solid #a00020!important}.eliminated-label,.team-row.eliminated>span,.roster-team.eliminated strong{color:#8a0018!important}}
+@media print{.team-row.eliminated{border-left:3px solid #a00020!important}.eliminated-label,.team-row.eliminated>span{color:#8a0018!important}}
+
+/* Celebração apenas na vitória da final e no pódio. */
+.team-row.win.champion-team{position:relative;isolation:isolate;overflow:hidden;background:linear-gradient(115deg,#493617,#74561e,#493617);border:1px solid #edc75c;color:#fff0b3;animation:champion-glow 3s ease-in-out infinite}
+.team-row.champion-team>span,.team-row.champion-team>strong{position:relative;z-index:1;color:#fff0b3}
+.champion-label{display:flex;align-items:center;gap:6px;color:#ffdb75;font-size:9px;font-weight:800;letter-spacing:.5px;margin-top:5px}
+.champion-crown{display:inline-block;width:23px;height:21px;flex:none;color:#ffd35c;filter:drop-shadow(0 0 5px #ffd35c88);animation:crown-shine 3s ease-in-out infinite;vertical-align:middle}
+.team-row.champion-team .match-source{color:#e2cd94}
+.champion-team:before,.champion-celebration:before{content:'';position:absolute;z-index:0;top:-40%;bottom:-40%;left:-65%;width:45%;background:linear-gradient(90deg,transparent,#fff8cc44,transparent);transform:skewX(-20deg);animation:champion-sweep 4.8s ease-in-out infinite;pointer-events:none}
+.champion-celebration{position:relative;isolation:isolate;overflow:hidden;border-color:#d7ad44;background:linear-gradient(120deg,#3f3017,#132a32);animation:champion-glow 3s ease-in-out infinite}
+.champion-celebration>*{position:relative;z-index:1}.champion-celebration>.champion-crown{display:block;width:43px;height:36px;margin-bottom:12px}.champion-celebration h2{color:#ffdf82}.podium-place.first-place{border-color:#ad8b3b;background:linear-gradient(135deg,#3c311b,#142c37)}.podium-place.first-place b{color:#ffdf82}
+@keyframes champion-glow{0%,100%{box-shadow:0 0 8px #edbe3822,inset 0 0 8px #ffd35c0d}50%{box-shadow:0 0 21px #edbe3855,inset 0 0 14px #ffd35c18}}
+@keyframes crown-shine{0%,100%{filter:drop-shadow(0 0 3px #ffd35c66);transform:translateY(0)}50%{filter:drop-shadow(0 0 8px #ffe795cc);transform:translateY(-2px)}}
+@keyframes champion-sweep{0%,55%{left:-65%;opacity:0}60%{opacity:1}90%,100%{left:150%;opacity:0}}
+@media(prefers-reduced-motion:reduce){.champion-team,.champion-celebration,.champion-crown,.champion-team:before,.champion-celebration:before{animation:none!important}.champion-team:before,.champion-celebration:before{display:none}}
+@media print{.champion-team,.champion-celebration,.champion-crown{animation:none!important;box-shadow:none!important;filter:none!important}.champion-team:before,.champion-celebration:before{display:none}.champion-crown,.champion-label{color:#705100!important}.team-row.champion-team{border:2px solid #9b791b!important}.team-row.champion-team>span,.team-row.champion-team>strong{color:#5a4000!important}}
