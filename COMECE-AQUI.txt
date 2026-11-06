@@ -1,16 +1,54 @@
-ROTEIRIZZE TORNEIOS V3.1
+ROTEIRIZZE TORNEIOS V3.5.0
 
-Extraia todo o ZIP. Abra admin.html.
+ATUALIZAR NO GITHUB
+Extraia o ZIP. Copie o conteúdo de Torneio-main para a raiz do seu repositório,
+substituindo os arquivos correspondentes. Mantenha a estrutura das pastas assets e vendor.
+A configuração de conexão existente em config.js foi preservada.
+Não é necessário instalar dependências nem executar build para publicar.
+A pasta tests é opcional na hospedagem; contém os testes da lógica.
 
-Criar competição (nome e quadras) > Criar categoria > Cadastrar duplas > Sortear e abrir chaveamento.
+COMO USAR
+1. Entre pelo painel administrativo do site.
+2. Crie uma categoria e preencha as duplas.
+3. Use Salvar sem sortear para guardar um cadastro incompleto e continuar depois.
+4. Quando todas as duplas estiverem preenchidas, use Sortear e abrir chaveamento.
+5. Os blocos de jogos seguem a sequência numérica da tabela. Termine o bloco
+   atual para liberar o próximo. Dentro do bloco, escolha os jogos prontos e as quadras.
+6. Para corrigir nomes, abra Duplas ou Editar nomes das duplas e Salvar alterações.
+   IDs das duplas, posições sorteadas, placares e classificação são preservados.
+7. Excluir categoria apaga a categoria inteira e pede EXCLUIR como confirmação.
+   Zerar categoria mantém as inscrições e permite um novo sorteio.
 
-Escolha os jogos manualmente. Para ausência, registre W.O. e selecione a dupla vencedora.
+VISUALIZAÇÃO
+A chave A ocupa a metade superior e a chave B, a inferior. Cada partida fica
+alinhada aos jogos que a alimentam, sem ordenar cartões apenas pelo número.
+Os vencedores avançam da esquerda para o centro e a repescagem, da direita
+para o centro. Cada metade tem sua semifinal. Final e terceiro lugar ficam
+no espaço central entre as metades. Use o zoom para ler os nomes.
 
-Abra LEIA-ME.html para o guia de uso.
+TABELAS
+Os novos sorteios usam cruzamentos fixos. A tabela de 18 duplas segue:
+Vencedores J1-J10; repescagem J11-J12; vencedores J13-J16;
+repescagem J17-J24; vencedores J25-J26; repescagem J27-J30;
+semifinais J31-J32; terceiro lugar J33; final J34.
 
-Os dados ficam no navegador. Esta versão não sincroniza aparelhos e não tem senha. Para duas abas compartilharem os dados, use a mesma origem HTTP no mesmo navegador. O guia explica o teste local.
+Quem entra adiante na chave sem disputar a etapa inicial é identificado como Biônico.
+A posição é determinada pela tabela de referência de cada quantidade.
+Na tabela de 18 duplas, 4 disputam os 2 jogos preliminares e 14 são biônicos.
+A tabela de 28 fornecida tem entradas em etapas diferentes e 20 biônicos;
+não foi substituída por uma chave genérica de 32 posições.
+As quatro duplas semifinalistas não recebem a marcação vermelha de eliminação.
+A final e a disputa de terceiro lugar exibem as posições finais.
 
-PUBLICAÇÃO
-Substitua os arquivos da versão anterior pelo conteúdo completo deste ZIP. Inclua routing.js, que permite abrir o painel tanto por /admin quanto por /admin.html.
+COMPETIÇÕES JÁ SALVAS
+Categorias sem resultados e sem cruzamentos dinâmicos passam para a tabela fixa
+quando carregadas. Categorias já iniciadas preservam o formato e o histórico antigos.
+Para trocar uma categoria iniciada para a tabela fixa, exporte um backup e use
+Zerar categoria, seguido de um novo sorteio. Essa ação apaga os resultados da categoria.
+Backups continuam no formato V3. As novas propriedades são preservadas pela versão 3.5.
 
-Os backups V3 e os dados da versão anterior no mesmo navegador e endereço continuam compatíveis.
+TESTES
+Com Node.js instalado, execute na pasta do projeto:
+node --test tests/engine.test.js tests/layout.test.js
+
+Consulte LEIA-ME.html para mais detalhes.

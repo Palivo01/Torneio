@@ -47,3 +47,21 @@
 @keyframes champion-sweep{0%,55%{left:-65%;opacity:0}60%{opacity:1}90%,100%{left:150%;opacity:0}}
 @media(prefers-reduced-motion:reduce){.champion-team,.champion-celebration,.champion-crown,.champion-team:before,.champion-celebration:before{animation:none!important}.champion-team:before,.champion-celebration:before{display:none}}
 @media print{.champion-team,.champion-celebration,.champion-crown{animation:none!important;box-shadow:none!important;filter:none!important}.champion-team:before,.champion-celebration:before{display:none}.champion-crown,.champion-label{color:#705100!important}.team-row.champion-team{border:2px solid #9b791b!important}.team-row.champion-team>span,.team-row.champion-team>strong{color:#5a4000!important}}
+
+/* Table sequence, bionic entries and finishing positions. */
+.sequence-panel{margin:0 0 18px;padding:18px;border:1px solid var(--line);border-radius:12px;background:var(--panel)}
+.sequence-panel h3{margin-bottom:12px}.sequence-blocks{display:flex;flex-wrap:wrap;gap:8px}
+.sequence-block{display:flex;flex-direction:column;gap:3px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;background:#0a1928;color:var(--muted);min-width:115px}
+.sequence-block strong{font-size:12px}.sequence-block span{font-size:13px}.sequence-block small{font-size:10px}
+.sequence-block.current{border-color:var(--cyan);color:var(--text);background:#103440}.sequence-block.current small{color:var(--cyan)}.sequence-block.complete{border-color:#3a665c}.sequence-block.complete small{color:#95d7bd}
+.bionic-label{display:block;color:var(--cyan);font-size:9px;font-weight:700;margin-top:3px}.placement-label{display:block;color:#b8cfdf;font-size:10px;font-weight:700;margin-top:3px}
+.podium-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:900px){.podium-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.sequence-blocks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.sequence-block{min-width:0}.podium-grid{grid-template-columns:1fr}}
+
+/* Familiar two-half bracket: games stay on the path of their feeder matches. */
+.bracket-half-heading{position:absolute;text-align:center;color:var(--cyan);font-size:14px;font-weight:800;letter-spacing:1px}
+.bracket-half-heading.losers-heading{color:var(--yellow)}.bracket-half-heading span{display:block;margin-top:4px;color:var(--muted);font-size:10px;letter-spacing:0;font-weight:400}
+.decision-caption{position:absolute;bottom:calc(100% + 10px);left:0;width:100%;text-align:center;color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:1px}
+.title-node .decision-caption{color:var(--yellow)}.entry-summary{color:var(--muted);font-size:12px;margin:6px 0 12px}
+@media print{.bracket-half-heading,.bracket-half-heading span,.decision-caption{color:#222!important}}
