@@ -1,4 +1,4 @@
-ROTEIRIZZE TORNEIOS V3.5.0
+ROTEIRIZZE TORNEIOS V4.0.1
 
 ATUALIZAR NO GITHUB
 Extraia o ZIP. Copie o conteúdo de Torneio-main para a raiz do seu repositório,
@@ -16,7 +16,11 @@ COMO USAR
    atual para liberar o próximo. Dentro do bloco, escolha os jogos prontos e as quadras.
 6. Para corrigir nomes, abra Duplas ou Editar nomes das duplas e Salvar alterações.
    IDs das duplas, posições sorteadas, placares e classificação são preservados.
-7. Excluir categoria apaga a categoria inteira e pede EXCLUIR como confirmação.
+7. Sortear novamente mantém as duplas, apaga os resultados da categoria e
+   realiza outro sorteio imediatamente. Digite SORTEAR para confirmar.
+   A ação fica disponível em categorias já sorteadas. Encerre ou reabra
+   jogos em quadra antes de realizar um novo sorteio.
+8. Excluir categoria apaga a categoria inteira e pede EXCLUIR como confirmação.
    Zerar categoria mantém as inscrições e permite um novo sorteio.
 
 VISUALIZAÇÃO
@@ -44,11 +48,11 @@ COMPETIÇÕES JÁ SALVAS
 Categorias sem resultados e sem cruzamentos dinâmicos passam para a tabela fixa
 quando carregadas. Categorias já iniciadas preservam o formato e o histórico antigos.
 Para trocar uma categoria iniciada para a tabela fixa, exporte um backup e use
-Zerar categoria, seguido de um novo sorteio. Essa ação apaga os resultados da categoria.
-Backups continuam no formato V3. As novas propriedades são preservadas pela versão 3.5.
+Sortear novamente, confirmando com SORTEAR. Essa ação apaga os resultados da categoria.
+Backups continuam no formato V3. As novas propriedades são preservadas pela versão 4.0.1.
 
 TESTES
 Com Node.js instalado, execute na pasta do projeto:
-node --test tests/engine.test.js tests/layout.test.js
+node --test tests/engine.test.js tests/layout.test.js tests/redraw.test.js
 
 Consulte LEIA-ME.html para mais detalhes.
