@@ -1,4 +1,6 @@
-# Instalação da versão 5.0.0
+# Instalação da versão 5.0.1
+
+**Se você já instalou a versão 5.0.0 e executou a migração, não precisa de outro SQL.** Publique os arquivos atualizados e siga `CONFIGURAR-EMAIL-SUPABASE.txt` para configurar as URLs e modelos de e-mail. O restante deste guia cobre a instalação inicial da V5.
 
 Esta versão usa novas tabelas e funções no mesmo projeto Supabase. Execute a migração antes de publicar os arquivos do site. A configuração de conexão existente foi preservada em `config.js`.
 
@@ -6,7 +8,7 @@ Esta versão usa novas tabelas e funções no mesmo projeto Supabase. Execute a 
 
 1. Exporte o backup JSON no painel atual, guarde uma cópia do repositório anterior e confirme que os últimos resultados foram salvos.
 2. Faça a instalação fora do horário de jogos. Interrompa os lançamentos e feche as abas antigas dos organizadores. Entre a migração e a publicação, a versão antiga perde acesso à tabela arquivada.
-3. No Supabase, abra **Authentication > Users**. Confira se a conta administrativa é `roteirizze@gmail.com` e se o e-mail está confirmado. O SQL procura essa conta existente; ele não cria usuário nem senha. Se o endereço for diferente, ajuste somente a variável `owner_email` no final do SQL.
+3. No Supabase, abra **Authentication > Users**. Confira se a conta administrativa é `roteirizze@outlook.com` e se o e-mail está confirmado. O SQL procura essa conta existente; ele não cria usuário nem senha. Se o endereço for diferente, ajuste somente a variável `owner_email` no final do SQL.
 4. Abra **SQL Editor**, selecione a função **postgres**, cole e execute o conteúdo completo de `supabase/001_v5_multi_competicoes.sql`. O arquivo tem uma transação única. Se a conta administrativa não for encontrada, a execução falha sem aplicar essa transação. Corrija o endereço ou a confirmação da conta e execute o arquivo completo novamente.
 5. Aguarde o sucesso da execução. Somente então copie o conteúdo desta pasta para a raiz do repositório GitHub e publique pela hospedagem que você já utiliza. Preserve `assets`, `vendor` e os scripts novos. Não há build ou dependências para instalar no site.
 6. Depois que a hospedagem terminar de publicar, atualize as páginas em todos os aparelhos, entre por `admin.html` com a conta administrativa e abra a competição anterior. Confira quantidade de categorias, duplas, posições sorteadas e placares antes de retomar o uso.
@@ -14,6 +16,10 @@ Esta versão usa novas tabelas e funções no mesmo projeto Supabase. Execute a 
 A migração copia cada registro existente de `public.torneio_competitions` para `public.rt_competitions` com o mesmo conteúdo de competição e revisão, atribuído à conta administrativa. O sorteio não é executado novamente. A tabela anterior fica preservada como arquivo para o proprietário do banco, sem acesso das versões antigas do site. Executar o SQL novamente não sobrescreve competições já copiadas ou criadas na versão nova.
 
 O endereço público inicial continua mostrando a competição antiga de ID `principal`. Cada competição também tem seu link próprio, disponível em **Copiar link público** ou **Copiar link**. Compartilhe o link público gerado pelo painel; o endereço administrativo exige autenticação e autorização.
+
+## Convites e senhas
+
+A página `auth.html` confirma o retorno do e-mail e permite criar a primeira senha do convite, recuperar uma senha ou alterar a senha da conta autenticada. Os retornos antigos em `index.html` e `admin.html` são encaminhados para ela. A configuração de URLs e dos modelos está em `CONFIGURAR-EMAIL-SUPABASE.txt`. Nenhuma senha é definida pelo administrador ao usar o fluxo de convite; a pessoa escolhe a própria senha depois de validar o link.
 
 ## Liberar outro organizador
 
@@ -51,7 +57,7 @@ O backup JSON continua usando o campo de formato `version: 3`; isso não é o n�
 
 Para inspecionar a instalação, execute o arquivo opcional `supabase/002_verificar_instalacao.sql` no SQL Editor como postgres. Ele só consulta o cadastro administrativo, metadados de competições e a igualdade entre a cópia atual e o arquivo anterior. Após novos salvamentos, é esperado que a cópia atual tenha revisão e conteúdo diferentes da tabela arquivada.
 
-Os testes locais da entrega cobrem 54 casos de lógica, layout, correções e comunicação, além de 20 verificações PostgreSQL de migração, permissões e concorrência. Para repetir os testes JavaScript com Node.js:
+Os testes locais da entrega cobrem 75 casos de lógica, layout, correções e comunicação, além de 20 verificações PostgreSQL de migração, permissões e concorrência. Para repetir os testes JavaScript com Node.js:
 
 ```sh
 node --test tests/*.test.js

@@ -35,7 +35,7 @@ async function organizers(){return await rpc('rt_list_organizers')||[];}
 async function setOrganizer(email,active){return rpc('rt_set_organizer',{p_email:email,p_active:active});}
 async function login(email,password){const r=await getClient().auth.signInWithPassword({email,password});if(r.error)throw Error('Não foi possível entrar. Confira e-mail, senha e conexão.');return identify();}
 async function logout(){const r=await getClient().auth.signOut({scope:'local'});backendError(r.error);session=null;role=null;}
-async function resetPassword(email){const redirect=new URL('admin.html',document.baseURI);redirect.search='';redirect.hash='';const r=await getClient().auth.resetPasswordForEmail(email,{redirectTo:redirect.href});backendError(r.error);}
+async function resetPassword(email){const redirect=new URL('auth.html',document.baseURI);redirect.search='';redirect.hash='';const r=await getClient().auth.resetPasswordForEmail(email,{redirectTo:redirect.href});backendError(r.error);}
 async function changePassword(password){const r=await getClient().auth.updateUser({password});backendError(r.error);}
 root.TorneioCloud={configured,configure,identify,list,load,loadIfChanged,create,save,organizers,setOrganizer,acceptRevision,login,logout,resetPassword,changePassword,get revision(){return revision;},get session(){return session;},get role(){return role;},get context(){return {...context};}};
 })(window);

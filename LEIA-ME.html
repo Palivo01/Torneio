@@ -1,17 +1,15 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guia 5.0.0 | Roteirizze Torneios</title><link rel="icon" href="assets/logo-color.png"><link rel="stylesheet" href="styles.css?v=5.0.0"></head><body><main style="max-width:950px;margin:24px auto;padding:20px"><section class="hero"><div class="copy"><p class="kicker">Roteirizze Torneios · 5.0.0</p><h1>Várias competições. Um painel.</h1><p>Comece pela migração SQL e depois publique os arquivos.</p><div class="actions"><a class="btn primary" href="admin.html">Abrir organização</a><a class="btn" href="INSTALACAO-V5.md">Instalação detalhada</a></div></div></section><section class="panel"><p style="white-space:pre-line">ESTA ATUALIZAÇÃO PRECISA DE SQL ANTES DO GITHUB
-Leia INSTALACAO-V5.md antes de publicar. A conexão de config.js foi mantida.
-A migração copia os dados atuais, incluindo sorteio e resultados, sem refazer jogos.
-Não executamos nenhuma alteração no seu Supabase ou no site em produção.</p></section><section class="panel"><p style="white-space:pre-line">ORDEM DE INSTALAÇÃO
-1. No site atual, exporte o backup JSON da competição e guarde o ZIP anterior.
-2. Escolha uma pausa nos lançamentos e feche os painéis antigos em todos os aparelhos.
-3. No Supabase &gt; Authentication &gt; Users, confira a conta administrativa confirmada:
-   roteirizze@gmail.com. Se a conta correta for outra, ajuste owner_email no SQL.
-4. No SQL Editor, execute TODO o arquivo supabase/001_v5_multi_competicoes.sql
-   como postgres. Espere terminar sem erros. Se falhar, não publique a versão nova.
-5. Copie o conteúdo de Torneio-main para a raiz do GitHub, preservando pastas.
-   Não precisa instalar dependências nem fazer build.
-6. Após publicar, recarregue o site em todos os aparelhos e entre por admin.html.
-   Confira duplas, sorteio e resultados da competição migrada antes de retomar.</p></section><section class="panel"><p style="white-space:pre-line">NOVIDADES
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guia 5.0.1 | Roteirizze Torneios</title><link rel="stylesheet" href="styles.css?v=5.0.1"></head><body><main style="max-width:950px;margin:24px auto;padding:20px"><section class="hero"><div class="copy"><p class="kicker">Roteirizze Torneios · 5.0.1</p><h1>Convites e senhas no seu site.</h1><p>Confirmação de e-mail, primeira senha e recuperação de acesso.</p><div class="actions"><a class="btn primary" href="admin.html">Abrir organização</a><a class="btn" href="CONFIGURAR-EMAIL-SUPABASE.txt">Configurar e-mails</a></div></div></section><section class="panel"><p style="white-space:pre-line">ATUALIZANDO DA VERSÃO 5.0.0
+Você já executou a migração SQL. Não precisa executar outro SQL.
+Publique os arquivos do site na raiz do GitHub, incluindo os quatro novos:
+auth.html, auth-flow.js, auth-page.js e auth-redirect.js.
+Mantenha assets e vendor. A conexão existente em config.js foi preservada.
+Não precisa instalar dependências ou fazer build.</p></section><section class="panel"><p style="white-space:pre-line">Depois configure Authentication &gt; URL Configuration e confira Email Templates
+conforme CONFIGURAR-EMAIL-SUPABASE.txt. A senha inicial agora pode ser criada
+pela própria pessoa no retorno do convite. Há telas de confirmação de e-mail,
+recuperação, link inválido ou expirado e alteração de senha dentro do painel.</p></section><section class="panel"><p style="white-space:pre-line">INSTALAÇÃO NOVA OU ANTERIOR À V5
+Leia INSTALACAO-V5.md. O SQL original está em supabase e usa a conta
+administrativa roteirizze@outlook.com. A migração preserva o sorteio e os resultados.
+Se ela já foi executada, não a repita para instalar esta correção de autenticação.</p></section><section class="panel"><p style="white-space:pre-line">NOVIDADES
 - Várias competições simultâneas, cada uma com suas categorias, quadras e link público.
 - Painel com filtros de preparação, andamento e finalizadas.
 - Roteirizze acessa todas. Cada organizador autorizado acessa só as que criou.
@@ -43,6 +41,7 @@ Biônico identifica quem entra adiante na chave. As posições de 1º a 4º são
 Categorias antigas já iniciadas mantêm cruzamentos e histórico existentes.</p></section><section class="panel"><p style="white-space:pre-line">TESTES
 Com Node.js instalado, execute na pasta:
 node --test tests/*.test.js
-54 testes aprovados na entrega, mais 20 verificações em PostgreSQL local.
+75 testes JavaScript aprovados nesta entrega. A migração V5 já foi validada
+anteriormente com 20 verificações em PostgreSQL local.
 O ambiente real do seu Supabase deve ser conferido após a instalação.</p></section><section class="panel"><p style="white-space:pre-line">Consulte LEIA-ME.html e INSTALACAO-V5.md para os detalhes.
 </p></section></main></body></html>
