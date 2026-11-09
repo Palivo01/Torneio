@@ -1,7 +1,7 @@
 (function(root){
 'use strict';
 const models=typeof module!=='undefined'?require('./templates.js'):BRACKET_MODELS;
-const uid=()=>typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID():'id-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2);
+const uid=()=>{if(typeof crypto!=='undefined'&&crypto.randomUUID)return crypto.randomUUID();const bytes=new Uint8Array(16);if(typeof crypto!=='undefined'&&crypto.getRandomValues)crypto.getRandomValues(bytes);else bytes.forEach((_,i)=>bytes[i]=Math.floor(Math.random()*256));bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;const hex=Array.from(bytes,b=>b.toString(16).padStart(2,'0')).join('');return hex.slice(0,8)+'-'+hex.slice(8,12)+'-'+hex.slice(12,16)+'-'+hex.slice(16,20)+'-'+hex.slice(20);};
 const normalize=s=>s.trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').toLowerCase();
 const fresh=()=>({version:3,created:false,name:'Nova competição',courts:1,categories:[],updated:null});
 function category(name,count){if(!models[count])throw Error('Quantidade de duplas indisponível.');return {id:uid(),name:name.trim(),count:Number(count),bracketMode:'fixed',teams:Array.from({length:Number(count)},()=>({id:uid(),a:'',b:''})),draw:[],confirmed:false,drawAt:null,results:{},routes:{}};}
@@ -27,7 +27,19 @@ function previousGames(c,id){const sequence=blocks(c),index=sequence.findIndex(b
 function graph(c){return models[c.count].games.map(g=>({...g,refs:isFixed(c)?g.refs:g.side==='L'?(c.routes[g.id]||['R','R']):g.side==='S'?(c.routes[g.id]||[g.refs[0],'Q']):g.refs}));}
 function order(c){const defs=graph(c),pending=[...defs],done=new Set(),out=[];while(pending.length){let changed=false;for(let i=0;i<pending.length;){const g=pending[i];if(g.refs.every(r=>!['V','P'].includes(r[0])||done.has(+r.slice(1)))){out.push(g);done.add(g.id);pending.splice(i,1);changed=true;}else i++;}if(!changed)throw Error('Cruzamento inválido ou circular.');}return out;}
 const validScore=r=>Array.isArray(r.score)&&r.score.length===2&&r.score.every(n=>Number.isInteger(n)&&n>=0&&n<=999)&&r.score[0]!==r.score[1];
-function resolve(c){const out={};for(const g of order(c)){const teams=g.refs.map(ref=>{const n=+ref.slice(1);if(ref[0]==='T')return c.draw[n-1]||null;if(!['V','P'].includes(ref[0]))return null;const p=out[n];return p?.done?(ref[0]==='V'?p.winner:p.loser):null;});const r=c.results[g.id]||{},ready=c.confirmed&&teams.every(Boolean)&&(!isFixed(c)||previousGames(c,g.id).every(id=>out[id]?.done)),wo=r.method==='wo',done=Boolean(ready&&r.status==='done'&&(wo?teams.includes(r.woWinner):validScore(r))),winner=done?(wo?r.woWinner:teams[r.score[0]>r.score[1]?0:1]):null;out[g.id]={...g,teams,ready:Boolean(ready),done,status:done?'done':ready&&r.status==='live'?'live':ready?'ready':'waiting',method:done?(wo?'wo':'score'):null,score:done&&!wo?r.score:null,court:r.court||null,endedAt:r.endedAt||null,winner,loser:done?teams.find(t=>t!==winner):null};}return out;}
+function resolve(c){
+ const out={};
+ for(const g of order(c)){
+  const teams=g.refs.map(ref=>{const n=+ref.slice(1);if(ref[0]==='T')return c.draw[n-1]||null;const previous=out[n];return previous?.done?(ref[0]==='V'?previous.winner:ref[0]==='P'?previous.loser:null):null;});
+  const r=c.results[g.id],defined=Boolean(c.confirmed&&teams.every(Boolean)),playedTeams=r?.participants||teams;
+  const conflict=Boolean(r&&(!defined||playedTeams.length!==2||pairKey(...playedTeams)!==pairKey(...teams)));
+  const ready=defined&&!conflict,wo=r?.method==='wo',score=r?.score&&ready?teams.map(id=>r.score[playedTeams.indexOf(id)]):null;
+  const done=Boolean(ready&&r?.status==='done'&&(wo?teams.includes(r.woWinner):validScore({score})));
+  const winner=done?(wo?r.woWinner:teams[score[0]>score[1]?0:1]):null;
+  out[g.id]={...g,teams,defined,ready,conflict,playedTeams:[...playedTeams],savedScore:r?.score||null,savedMethod:r?.method||null,savedStatus:r?.status||null,done,status:conflict?'conflict':done?'done':ready&&r?.status==='live'?'live':ready?'ready':'waiting',method:done?(wo?'wo':'score'):null,score:done&&!wo?score:null,court:r?.court||null,endedAt:r?.endedAt||null,winner,loser:done?teams.find(t=>t!==winner):null};
+ }
+ return out;
+}
 function halves(c){const gs=models[c.count].games.filter(g=>g.side==='W'),used=new Set(gs.flatMap(g=>g.refs.filter(r=>r[0]==='V').map(r=>+r.slice(1)))),roots=gs.filter(g=>!used.has(g.id)),byId=Object.fromEntries(gs.map(g=>[g.id,g])),out={};function visit(g,side){for(const r of g.refs)if(r[0]==='T')out[c.draw[+r.slice(1)-1]]=side;else visit(byId[+r.slice(1)],side);}roots.forEach((g,i)=>visit(g,i));return {teams:out,roots};}
 const pairKey=(a,b)=>[a,b].sort().join('|');
 function encountered(resolved,a,b,exclude){return Object.values(resolved).some(g=>g.id!==exclude&&g.done&&pairKey(...g.teams)===pairKey(a,b));}
@@ -42,14 +54,38 @@ if(slots.length&&(!allW&&tickets.length<=2))return;
 for(const slot of slots){let best=null;for(let i=0;i<tickets.length;i++)for(let j=i+1;j<tickets.length;j++){const a=tickets[i],b=tickets[j];if(a.team===b.team||encountered(resolved,a.team,b.team))continue;const cost=half[a.team]===half[b.team]?1:0;if(!best||cost<best.cost)best={i,j,cost};}if(!best)break;const a=tickets[best.i],b=tickets[best.j];c.routes[slot.id]=[a.ref,b.ref];tickets=tickets.filter((t,i)=>i!==best.i&&i!==best.j);}
 if(losers.every(g=>resolve(c)[g.id].done)&&allW){const now=resolve(c),usedTickets=new Set(losers.flatMap(g=>c.routes[g.id]||[]));const qualifiers=Object.values(now).filter(g=>g.done&&['W','L'].includes(g.side)).map(g=>({ref:(g.side==='W'?'P':'V')+g.id,team:g.side==='W'?g.loser:g.winner})).filter(t=>!usedTickets.has(t.ref));if(qualifiers.length!==2)throw Error('Não foi possível definir os semifinalistas.');const semis=defs.filter(g=>g.side==='S');for(const s of semis){if(c.routes[s.id])continue;const wref=s.refs[0],winner=now[+wref.slice(1)].winner;let i=qualifiers.findIndex(t=>half[t.team]!==half[winner]);if(i<0)i=0;const ticket=qualifiers.splice(i,1)[0];c.routes[s.id]=[wref,ticket.ref];}}
 }
-function descendants(c,id){const found=new Set();let changed=true;while(changed){changed=false;for(const g of graph(c))if(!found.has(g.id)&&g.refs.some(r=>['V','P'].includes(r[0])&&(+r.slice(1)===id||found.has(+r.slice(1))))){found.add(g.id);changed=true;}}if(isFixed(c)){const sequence=blocks(c),index=sequence.findIndex(b=>b.ids.includes(id));for(const b of sequence.slice(index+1))for(const n of b.ids)found.add(n);}if(['W','L'].includes(models[c.count].games.find(g=>g.id===id)?.side))for(const g of models[c.count].games)if(['S','B','F'].includes(g.side))found.add(g.id);return [...found].filter(n=>n!==id);}
+function descendants(c,id){const found=new Set();let changed=true;while(changed){changed=false;for(const g of graph(c))if(!found.has(g.id)&&g.refs.some(ref=>['V','P'].includes(ref[0])&&(+ref.slice(1)===id||found.has(+ref.slice(1))))){found.add(g.id);changed=true;}}return [...found].filter(n=>n!==id);}
 function players(c,ids){return new Set(ids.flatMap(id=>{const t=c.teams.find(t=>t.id===id);return t?[normalize(t.a),normalize(t.b)]:[];}));}
 function active(comp){return comp.categories.flatMap(c=>Object.values(resolve(c)).filter(m=>m.status==='live').map(m=>({c,m,players:players(c,m.teams)})));}
 function availability(comp,c,id,court,now=Date.now()){const m=resolve(c)[id];if(!m?.ready)return 'Aguarde a definição das duas duplas.';if(!Number.isInteger(court)||court<1||court>comp.courts)return 'Escolha uma quadra.';const p=players(c,m.teams);for(const live of active(comp)){if(live.c.id===c.id&&live.m.id===id)continue;if(live.m.court===court)return 'A quadra '+court+' já está ocupada.';if([...p].some(x=>live.players.has(x)))return 'Um dos atletas já está em outra partida.';}return null;}
-function mutate(comp,c,id,result){const resolved=resolve(c),m=resolved[id];if(!m?.ready)throw Error('Este jogo depende de partidas anteriores.');if(!['ready','live','done'].includes(result.status))throw Error('Situação inválida.');if(result.status==='done'){if(result.method==='wo'){if(!m.teams.includes(result.woWinner))throw Error('Escolha a dupla vencedora por W.O.');}else if(!validScore(result))throw Error('Preencha dois placares inteiros diferentes, de 0 a 999.');}
-if(result.status!=='ready'&&(!Number.isInteger(result.court)||result.court<1||result.court>comp.courts))throw Error('Selecione a quadra.');if(result.status==='live'){const err=availability(comp,c,id,result.court);if(err)throw Error(err);}if(!isFixed(c)&&m.side==='L'&&encountered(resolved,...m.teams,id))throw Error('Este confronto já aconteceu. O cruzamento precisa ser atualizado.');
-const affected=m.done?descendants(c,id):[];if(affected.some(n=>c.results[n]?.status==='live'))throw Error('Há jogo dependente em quadra. Reabra-o antes de corrigir a origem.');for(const n of affected){delete c.results[n];delete c.routes[n];}if(result.status==='ready')delete c.results[id];else c.results[id]={status:result.status,court:result.court,...(result.status==='done'?{method:result.method==='wo'?'wo':'score',...(result.method==='wo'?{woWinner:result.woWinner}:{score:[...result.score]}),endedAt:new Date().toISOString()}:{startedAt:new Date().toISOString()})};plan(c);return c;}
-function assign(comp,c,id,court){const m=resolve(c)[id];if(m?.status!=='ready')throw Error('Escolha um jogo pronto.');if(!Number.isInteger(court)||court<1||court>comp.courts)throw Error('Quadra inválida.');c.results[id]={status:'queued',court};}
+function prepareChange(comp,c,id,result){
+ const before=resolve(c),m=before[id];
+ if(!m||(!m.ready&&!(m.conflict&&(result.status==='ready'||result.review&&m.defined))))throw Error('Este jogo depende da definição dos adversários.');
+ if(!['ready','live','done'].includes(result.status))throw Error('Situação inválida.');
+ if(result.status==='done'){
+  if(result.method==='wo'){if(!m.teams.includes(result.woWinner))throw Error('Escolha a dupla vencedora por W.O.');}
+  else if(!validScore(result))throw Error('Preencha dois placares inteiros diferentes, de 0 a 999.');
+ }
+ if(result.status!=='ready'&&(!Number.isInteger(result.court)||result.court<1||result.court>comp.courts))throw Error('Selecione a quadra.');
+ if(result.status==='live'){const error=availability(comp,c,id,result.court);if(error)throw Error(error);}
+ const candidate=JSON.parse(JSON.stringify(c));
+ // Freeze actual participants before changing an old source result. No score is moved to a different pair.
+ for(const [key,r] of Object.entries(candidate.results))if(!r.participants&&before[key]?.defined)r.participants=[...before[key].teams];
+ if(result.status==='ready')delete candidate.results[id];
+ else candidate.results[id]={status:result.status,court:result.court,participants:[...m.teams],...(result.status==='done'?{method:result.method==='wo'?'wo':'score',...(result.method==='wo'?{woWinner:result.woWinner}:{score:[...result.score]}),endedAt:new Date().toISOString()}:{startedAt:new Date().toISOString()})};
+ let after=resolve(candidate);
+ const liveConflicts=Object.values(after).filter(g=>g.conflict&&candidate.results[g.id]?.status==='live');
+ if(liveConflicts.length)throw Error('A correção altera os adversários de '+liveConflicts.map(g=>'J'+g.id).join(', ')+', em quadra. Encerre ou reabra essas partidas antes.');
+ if(!Object.values(after).some(g=>g.conflict))plan(candidate);
+ after=resolve(candidate);
+ const conflicts=Object.values(after).filter(g=>g.conflict).map(g=>g.id),newConflicts=conflicts.filter(n=>!before[n]?.conflict);
+ const preserved=Object.values(before).filter(g=>g.id!==id&&g.done&&after[g.id]?.done&&g.winner===after[g.id].winner).length;
+ return {candidate,conflicts,newConflicts,preserved};
+}
+function previewChange(comp,c,id,result){const {candidate,...impact}=prepareChange(comp,c,id,result);return impact;}
+function mutate(comp,c,id,result){const change=prepareChange(comp,c,id,result);Object.assign(c,change.candidate);return c;}
+function assign(comp,c,id,court){const m=resolve(c)[id];if(m?.status!=='ready')throw Error('Escolha um jogo pronto.');if(!Number.isInteger(court)||court<1||court>comp.courts)throw Error('Quadra inválida.');c.results[id]={status:'queued',court,participants:[...m.teams]};}
+function competitionState(comp){const categories=comp.categories||[];if(!categories.length||!categories.some(c=>c.confirmed))return 'preparation';return categories.every(c=>Object.values(resolve(c)).every(g=>g.done))?'finished':'active';}
 function redrawCategory(c,confirmation){
  if(String(confirmation).trim()!=='SORTEAR')throw Error('Digite SORTEAR para confirmar.');
  if(!c.confirmed)throw Error('Esta categoria ainda não possui sorteio confirmado.');
@@ -60,10 +96,48 @@ function redrawCategory(c,confirmation){
  Object.assign(c,candidate);return c;
 }
 function resetCategory(c){c.bracketMode='fixed';c.results={};c.routes={};c.draw=[];c.confirmed=false;c.drawAt=null;}
-function validate(x){if(!x||x.version!==3)throw Error('Selecione um backup da versão 3.');if(typeof x.created!=='boolean'||typeof x.name!=='string'||!x.name.trim()||x.name.length>100||!Number.isInteger(x.courts)||x.courts<1||x.courts>3||!Array.isArray(x.categories)||x.categories.length>100)throw Error('Backup inválido.');const out=fresh();Object.assign(out,{created:x.created,name:x.name,courts:x.courts,updated:typeof x.updated==='string'&&Number.isFinite(Date.parse(x.updated))?x.updated:null});if(!out.created&&x.categories.length)throw Error('Competição inválida.');const cats=new Set();for(const c of x.categories){if(!c||typeof c.id!=='string'||!c.id||cats.has(c.id)||typeof c.name!=='string'||!c.name.trim()||c.name.length>80||!Number.isInteger(c.count)||!models[c.count]||!Array.isArray(c.teams)||c.teams.length!==c.count||typeof c.confirmed!=='boolean'||!Array.isArray(c.draw)||!c.results||typeof c.results!=='object'||Array.isArray(c.results)||!c.routes||typeof c.routes!=='object'||Array.isArray(c.routes))throw Error('Categoria inválida.');cats.add(c.id);const clean=category(c.name,c.count);clean.id=c.id;if(c.bracketMode!==undefined&&!['fixed','legacy'].includes(c.bracketMode))throw Error('Formato de chaveamento inválido.');clean.bracketMode=c.bracketMode==='fixed'||(!Object.keys(c.results).length&&!Object.keys(c.routes).length)?'fixed':'legacy';if(isFixed(clean)&&Object.keys(c.routes).length)throw Error('A tabela fixa não aceita cruzamentos dinâmicos.');clean.teams=[];const ids=new Set();for(const t of c.teams){if(!t||typeof t.id!=='string'||!t.id||ids.has(t.id)||typeof t.a!=='string'||typeof t.b!=='string'||t.a.length>60||t.b.length>60)throw Error('Dupla inválida.');ids.add(t.id);clean.teams.push({id:t.id,a:t.a,b:t.b});}if(c.draw.length){if(c.draw.length!==c.count||new Set(c.draw).size!==c.count||!c.draw.every(id=>ids.has(id)))throw Error('Sorteio inválido.');clean.draw=[...c.draw];validateTeams(clean);}else if(c.confirmed)throw Error('Categoria sem sorteio.');clean.confirmed=c.confirmed;clean.drawAt=typeof c.drawAt==='string'?c.drawAt:null;
-const defs=models[c.count].games,used=new Set();for(const [key,refs] of Object.entries(c.routes)){const g=defs.find(g=>String(g.id)===key);if(!g||!['L','S'].includes(g.side)||!Array.isArray(refs)||refs.length!==2||!refs.every(r=>typeof r==='string'&&/^[VP]\d+$/.test(r)&&defs.some(d=>d.id===+r.slice(1))))throw Error('Cruzamento inválido.');if(g.side==='S'&&refs[0]!==g.refs[0])throw Error('Semifinal inválida.');for(const ref of refs.slice(g.side==='S'?1:0)){const source=defs.find(d=>d.id===+ref.slice(1));if(!(ref[0]==='P'&&source.side==='W'||ref[0]==='V'&&source.side==='L')||used.has(ref))throw Error('Classificado duplicado ou inválido.');used.add(ref);}clean.routes[key]=[...refs];}
-for(const key of Object.keys(c.results))if(!defs.some(g=>String(g.id)===key))throw Error('Jogo desconhecido.');for(const g of order(clean)){const r=c.results[g.id];if(!r)continue;const m=resolve(clean)[g.id];if(!m.ready||!['queued','live','done'].includes(r.status)||!Number.isInteger(r.court)||r.court<1||r.court>out.courts)throw Error('Resultado inconsistente.');const copy={status:r.status,court:r.court};if(r.status==='done'){if(r.method==='wo'){if(!m.teams.includes(r.woWinner))throw Error('W.O. inválido.');Object.assign(copy,{method:'wo',woWinner:r.woWinner});}else{if(!validScore(r))throw Error('Placar inválido.');Object.assign(copy,{method:'score',score:[...r.score]});}copy.endedAt=typeof r.endedAt==='string'&&Number.isFinite(Date.parse(r.endedAt))?r.endedAt:null;}else if(r.status==='live')copy.startedAt=typeof r.startedAt==='string'?r.startedAt:null;clean.results[g.id]=copy;}
-const resolved=resolve(clean);for(const g of graph(clean))if(c.routes[g.id]){const m=resolved[g.id];if(!m.ready||m.teams[0]===m.teams[1])throw Error('Duplas inválidas no cruzamento.');if(!isFixed(clean)&&g.side==='L'&&encountered(resolved,...m.teams,m.id))throw Error('O backup contém um reencontro antes das semifinais.');}out.categories.push(clean);}
-const lives=active(out);for(let i=0;i<lives.length;i++)for(let j=i+1;j<lives.length;j++)if(lives[i].m.court===lives[j].m.court||[...lives[i].players].some(p=>lives[j].players.has(p)))throw Error('Há jogos simultâneos incompatíveis.');return out;}
-const api={models,uid,normalize,fresh,category,teamName,validateTeams,saveTeams,deleteCategory,draw,isFixed,blocks,previousGames,graph,order,resolve,plan,descendants,players,active,availability,mutate,assign,redrawCategory,resetCategory,validate,encountered,pairKey};if(typeof module!=='undefined')module.exports=api;else root.Arena=api;
+function validate(x){
+ if(!x||x.version!==3)throw Error('Selecione um backup no formato V3.');
+ if(typeof x.created!=='boolean'||typeof x.name!=='string'||!x.name.trim()||x.name.length>100||!Number.isInteger(x.courts)||x.courts<1||x.courts>3||!Array.isArray(x.categories)||x.categories.length>100)throw Error('Backup inválido.');
+ const out=fresh();Object.assign(out,{created:x.created,name:x.name,courts:x.courts,updated:typeof x.updated==='string'&&Number.isFinite(Date.parse(x.updated))?x.updated:null});
+ if(!out.created&&x.categories.length)throw Error('Competição inválida.');const categoryIds=new Set();
+ for(const c of x.categories){
+  if(!c||typeof c.id!=='string'||!c.id||categoryIds.has(c.id)||typeof c.name!=='string'||!c.name.trim()||c.name.length>80||!Number.isInteger(c.count)||!models[c.count]||!Array.isArray(c.teams)||c.teams.length!==c.count||typeof c.confirmed!=='boolean'||!Array.isArray(c.draw)||!c.results||typeof c.results!=='object'||Array.isArray(c.results)||!c.routes||typeof c.routes!=='object'||Array.isArray(c.routes))throw Error('Categoria inválida.');
+  categoryIds.add(c.id);const clean=category(c.name,c.count);clean.id=c.id;
+  if(c.bracketMode!==undefined&&!['fixed','legacy'].includes(c.bracketMode))throw Error('Formato de chaveamento inválido.');
+  clean.bracketMode=c.bracketMode==='fixed'||(!Object.keys(c.results).length&&!Object.keys(c.routes).length)?'fixed':'legacy';
+  if(isFixed(clean)&&Object.keys(c.routes).length)throw Error('A tabela fixa não aceita cruzamentos dinâmicos.');
+  clean.teams=[];const ids=new Set();
+  for(const t of c.teams){if(!t||typeof t.id!=='string'||!t.id||ids.has(t.id)||typeof t.a!=='string'||typeof t.b!=='string'||t.a.length>60||t.b.length>60)throw Error('Dupla inválida.');ids.add(t.id);clean.teams.push({id:t.id,a:t.a,b:t.b});}
+  if(c.draw.length){if(c.draw.length!==c.count||new Set(c.draw).size!==c.count||!c.draw.every(id=>ids.has(id)))throw Error('Sorteio inválido.');clean.draw=[...c.draw];validateTeams(clean);}else if(c.confirmed)throw Error('Categoria sem sorteio.');
+  clean.confirmed=c.confirmed;clean.drawAt=typeof c.drawAt==='string'?c.drawAt:null;
+  const defs=models[c.count].games,used=new Set();
+  for(const [key,refs]of Object.entries(c.routes)){
+   const g=defs.find(g=>String(g.id)===key);
+   if(!g||!['L','S'].includes(g.side)||!Array.isArray(refs)||refs.length!==2||!refs.every(ref=>typeof ref==='string'&&/^[VP]\d+$/.test(ref)&&defs.some(d=>d.id===+ref.slice(1))))throw Error('Cruzamento inválido.');
+   if(g.side==='S'&&refs[0]!==g.refs[0])throw Error('Semifinal inválida.');
+   for(const ref of refs.slice(g.side==='S'?1:0)){const source=defs.find(d=>d.id===+ref.slice(1));if(!(ref[0]==='P'&&source.side==='W'||ref[0]==='V'&&source.side==='L')||used.has(ref))throw Error('Classificado duplicado ou inválido.');used.add(ref);}
+   clean.routes[key]=[...refs];
+  }
+  for(const key of Object.keys(c.results))if(!defs.some(g=>String(g.id)===key))throw Error('Jogo desconhecido.');
+  for(const g of order(clean)){
+   const r=c.results[g.id];if(!r)continue;
+   if(!['queued','live','done'].includes(r.status)||!Number.isInteger(r.court)||r.court<1||r.court>out.courts)throw Error('Resultado inconsistente.');
+   const expected=resolve(clean)[g.id],participants=r.participants||expected.teams;
+   if(!Array.isArray(participants)||participants.length!==2||participants[0]===participants[1]||!participants.every(id=>ids.has(id)))throw Error('Participantes inválidos no resultado.');
+   const copy={status:r.status,court:r.court,participants:[...participants]};
+   if(r.status==='done'){
+    if(r.method==='wo'){if(!participants.includes(r.woWinner))throw Error('W.O. inválido.');Object.assign(copy,{method:'wo',woWinner:r.woWinner});}
+    else {if(!validScore(r))throw Error('Placar inválido.');Object.assign(copy,{method:'score',score:[...r.score]});}
+    copy.endedAt=typeof r.endedAt==='string'&&Number.isFinite(Date.parse(r.endedAt))?r.endedAt:null;
+   }else if(r.status==='live')copy.startedAt=typeof r.startedAt==='string'?r.startedAt:null;
+   clean.results[g.id]=copy;
+  }
+  if(Object.values(resolve(clean)).some(g=>g.conflict&&clean.results[g.id]?.status==='live'))throw Error('Há partida em quadra com adversários pendentes de revisão.');
+  out.categories.push(clean);
+ }
+ const lives=active(out);for(let i=0;i<lives.length;i++)for(let j=i+1;j<lives.length;j++)if(lives[i].m.court===lives[j].m.court||[...lives[i].players].some(p=>lives[j].players.has(p)))throw Error('Há jogos simultâneos incompatíveis.');
+ return out;
+}
+const api={models,uid,normalize,fresh,category,teamName,validateTeams,saveTeams,deleteCategory,draw,isFixed,blocks,previousGames,graph,order,resolve,plan,descendants,players,active,availability,previewChange,mutate,assign,competitionState,redrawCategory,resetCategory,validate,encountered,pairKey};if(typeof module!=='undefined')module.exports=api;else root.Arena=api;
 })(typeof window!=='undefined'?window:globalThis);

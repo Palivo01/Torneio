@@ -1,58 +1,61 @@
-ROTEIRIZZE TORNEIOS V4.0.1
+ROTEIRIZZE TORNEIOS 5.0.0
 
-ATUALIZAR NO GITHUB
-Extraia o ZIP. Copie o conteúdo de Torneio-main para a raiz do seu repositório,
-substituindo os arquivos correspondentes. Mantenha a estrutura das pastas assets e vendor.
-A configuração de conexão existente em config.js foi preservada.
-Não é necessário instalar dependências nem executar build para publicar.
-A pasta tests é opcional na hospedagem; contém os testes da lógica.
+ESTA ATUALIZAÇÃO PRECISA DE SQL ANTES DO GITHUB
+Leia INSTALACAO-V5.md antes de publicar. A conexão de config.js foi mantida.
+A migração copia os dados atuais, incluindo sorteio e resultados, sem refazer jogos.
+Não executamos nenhuma alteração no seu Supabase ou no site em produção.
 
-COMO USAR
-1. Entre pelo painel administrativo do site.
-2. Crie uma categoria e preencha as duplas.
-3. Use Salvar sem sortear para guardar um cadastro incompleto e continuar depois.
-4. Quando todas as duplas estiverem preenchidas, use Sortear e abrir chaveamento.
-5. Os blocos de jogos seguem a sequência numérica da tabela. Termine o bloco
-   atual para liberar o próximo. Dentro do bloco, escolha os jogos prontos e as quadras.
-6. Para corrigir nomes, abra Duplas ou Editar nomes das duplas e Salvar alterações.
-   IDs das duplas, posições sorteadas, placares e classificação são preservados.
-7. Sortear novamente mantém as duplas, apaga os resultados da categoria e
-   realiza outro sorteio imediatamente. Digite SORTEAR para confirmar.
-   A ação fica disponível em categorias já sorteadas. Encerre ou reabra
-   jogos em quadra antes de realizar um novo sorteio.
-8. Excluir categoria apaga a categoria inteira e pede EXCLUIR como confirmação.
-   Zerar categoria mantém as inscrições e permite um novo sorteio.
+ORDEM DE INSTALAÇÃO
+1. No site atual, exporte o backup JSON da competição e guarde o ZIP anterior.
+2. Escolha uma pausa nos lançamentos e feche os painéis antigos em todos os aparelhos.
+3. No Supabase > Authentication > Users, confira a conta administrativa confirmada:
+   roteirizze@gmail.com. Se a conta correta for outra, ajuste owner_email no SQL.
+4. No SQL Editor, execute TODO o arquivo supabase/001_v5_multi_competicoes.sql
+   como postgres. Espere terminar sem erros. Se falhar, não publique a versão nova.
+5. Copie o conteúdo de Torneio-main para a raiz do GitHub, preservando pastas.
+   Não precisa instalar dependências nem fazer build.
+6. Após publicar, recarregue o site em todos os aparelhos e entre por admin.html.
+   Confira duplas, sorteio e resultados da competição migrada antes de retomar.
 
-VISUALIZAÇÃO
-A chave A ocupa a metade superior e a chave B, a inferior. Cada partida fica
-alinhada aos jogos que a alimentam, sem ordenar cartões apenas pelo número.
-Os vencedores avançam da esquerda para o centro e a repescagem, da direita
-para o centro. Cada metade tem sua semifinal. Final e terceiro lugar ficam
-no espaço central entre as metades. Use o zoom para ler os nomes.
+NOVIDADES
+- Várias competições simultâneas, cada uma com suas categorias, quadras e link público.
+- Painel com filtros de preparação, andamento e finalizadas.
+- Roteirizze acessa todas. Cada organizador autorizado acessa só as que criou.
+- Autorização por e-mail no painel geral, após criar ou convidar e confirmar a conta
+  no Supabase Authentication. O site nunca recebe a chave service_role.
+- Qualquer partida com as duas duplas definidas pode ser lançada ou iniciada.
+  Os blocos agora servem como referência, sem bloquear as próximas etapas.
+- Corrigir placar mantendo o vencedor preserva os demais resultados.
+- Trocar vencedor preserva os registros afetados, marcando-os Em revisão.
+  Jogos independentes continuam válidos. Nenhum placar é atribuído a novas duplas.
+- Consulta leve de revisão antes de baixar a competição. Acompanhamento público
+  a cada 10 segundos, ou 60 segundos ao terminar; pausa com a aba oculta.
 
-TABELAS
-Os novos sorteios usam cruzamentos fixos. A tabela de 18 duplas segue:
-Vencedores J1-J10; repescagem J11-J12; vencedores J13-J16;
-repescagem J17-J24; vencedores J25-J26; repescagem J27-J30;
-semifinais J31-J32; terceiro lugar J33; final J34.
+COMO CORRIGIR UM RESULTADO
+Abra Gerenciar jogos e clique Corrigir na partida errada. Se a mudança trocar
+adversários de partidas já registradas, o painel apresenta o impacto antes de salvar.
+Depois, use Ver partidas em revisão. Em Revisar, aparecem as duplas e o placar
+antigos, além dos adversários previstos agora. O novo placar começa em branco.
+Confira as duplas, informe o resultado correto e marque a confirmação.
+Resolva primeiro as partidas de origem se ainda houver adversários indefinidos.
+Se o resultado original estava certo, restaurá-lo recupera automaticamente os
+registros preservados cujos participantes voltarem a corresponder.
+Não é possível validar como correto um jogo disputado por outras duplas.
+Se um jogo afetado estiver em quadra, reabra esse jogo antes de mudar a origem.
 
-Quem entra adiante na chave sem disputar a etapa inicial é identificado como Biônico.
-A posição é determinada pela tabela de referência de cada quantidade.
-Na tabela de 18 duplas, 4 disputam os 2 jogos preliminares e 14 são biônicos.
-A tabela de 28 fornecida tem entradas em etapas diferentes e 20 biônicos;
-não foi substituída por uma chave genérica de 32 posições.
-As quatro duplas semifinalistas não recebem a marcação vermelha de eliminação.
-A final e a disputa de terceiro lugar exibem as posições finais.
-
-COMPETIÇÕES JÁ SALVAS
-Categorias sem resultados e sem cruzamentos dinâmicos passam para a tabela fixa
-quando carregadas. Categorias já iniciadas preservam o formato e o histórico antigos.
-Para trocar uma categoria iniciada para a tabela fixa, exporte um backup e use
-Sortear novamente, confirmando com SORTEAR. Essa ação apaga os resultados da categoria.
-Backups continuam no formato V3. As novas propriedades são preservadas pela versão 4.0.1.
+RECURSOS ANTERIORES MANTIDOS
+Salvar cadastro sem sortear, editar nomes a qualquer momento, excluir categoria,
+Sortear novamente com SORTEAR, zerar com ZERAR e excluir com EXCLUIR.
+Novo sorteio apaga resultados apenas da categoria escolhida: não é uma correção.
+Zerar competição afeta apenas a competição aberta. Para começar outra, use Criar competição.
+Chave A em cima e B embaixo; vencedores à esquerda e repescagem à direita.
+Biônico identifica quem entra adiante na chave. As posições de 1º a 4º são destacadas.
+Categorias antigas já iniciadas mantêm cruzamentos e histórico existentes.
 
 TESTES
-Com Node.js instalado, execute na pasta do projeto:
-node --test tests/engine.test.js tests/layout.test.js tests/redraw.test.js
+Com Node.js instalado, execute na pasta:
+node --test tests/*.test.js
+54 testes aprovados na entrega, mais 20 verificações em PostgreSQL local.
+O ambiente real do seu Supabase deve ser conferido após a instalação.
 
-Consulte LEIA-ME.html para mais detalhes.
+Consulte LEIA-ME.html e INSTALACAO-V5.md para os detalhes.
