@@ -1,8 +1,19 @@
-# Atualização para 5.1.0
+# Revisão 5.2.1
 
-A versão 5.1.0 precisa do SQL complementar `supabase/003_v51_logos.sql`, mesmo para quem já instalou a V5. Faça backup, feche os painéis antigos, execute o arquivo completo como postgres e publique todos os arquivos atualizados. Não repita o SQL 001 se sua migração V5 já foi feita. Consulte `COMECE-AQUI.txt` para os recursos, as limitações da análise das semifinais e a validação da entrega.
+Leia `ATUALIZACAO-5.2.1.txt`. Não há SQL adicional para quem já instalou 5.2.
+Publique o conteúdo completo na raiz servida e confira v5.2.1 no rodapé.
 
-O restante abaixo descreve a instalação da base V5 e do acesso. Para instalação nova, execute também o SQL 003 depois do SQL 001.
+# Atualização para 5.2.0
+
+Se a 5.1 já está instalada e seu SQL 003 foi executado, aplique somente
+`supabase/004_v52_portal.sql` como postgres antes de publicar o site.
+O comando cria o catálogo dos eventos publicados e não refaz sorteios nem altera
+resultados existentes. Se ainda estiver na base 5.0, execute primeiro
+`supabase/003_v51_logos.sql` e depois 004. Para instalação nova, execute 001, 003 e 004.
+
+Faça backup, feche os painéis antigos e publique todos os arquivos desta versão,
+incluindo assets, vendor, viewport.js, print-bracket.js e portal.js.
+A pasta supabase não precisa ir para a hospedagem. Consulte COMECE-AQUI.txt.
 
 ---
 
@@ -23,7 +34,7 @@ Esta versão usa novas tabelas e funções no mesmo projeto Supabase. Execute a 
 
 A migração copia cada registro existente de `public.torneio_competitions` para `public.rt_competitions` com o mesmo conteúdo de competição e revisão, atribuído à conta administrativa. O sorteio não é executado novamente. A tabela anterior fica preservada como arquivo para o proprietário do banco, sem acesso das versões antigas do site. Executar o SQL novamente não sobrescreve competições já copiadas ou criadas na versão nova.
 
-O endereço público inicial continua mostrando a competição antiga de ID `principal`. Cada competição também tem seu link próprio, disponível em **Copiar link público** ou **Copiar link**. Compartilhe o link público gerado pelo painel; o endereço administrativo exige autenticação e autorização.
+Na versão 5.2, o endereço público inicial lista os torneios publicados. A competição antiga de ID `principal` mantém seu link próprio. Cada competição também tem seu link próprio, disponível em **Copiar link público** ou **Copiar link**. Compartilhe o link público gerado pelo painel; o endereço administrativo exige autenticação e autorização.
 
 ## Convites e senhas
 
@@ -65,7 +76,7 @@ O backup JSON continua usando o campo de formato `version: 3`; isso não é o n�
 
 Para inspecionar a instalação, execute o arquivo opcional `supabase/002_verificar_instalacao.sql` no SQL Editor como postgres. Ele só consulta o cadastro administrativo, metadados de competições e a igualdade entre a cópia atual e o arquivo anterior. Após novos salvamentos, é esperado que a cópia atual tenha revisão e conteúdo diferentes da tabela arquivada.
 
-Os testes locais da entrega cobrem 75 casos de lógica, layout, correções e comunicação, além de 20 verificações PostgreSQL de migração, permissões e concorrência. Para repetir os testes JavaScript com Node.js:
+Os testes locais da entrega cobrem 98 casos JavaScript e 21 verificações PostgreSQL. Consulte COMECE-AQUI.txt para o escopo e as limitações da validação. Para repetir os testes JavaScript com Node.js:
 
 ```sh
 node --test tests/*.test.js

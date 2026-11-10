@@ -1,19 +1,97 @@
-ROTEIRIZZE TORNEIOS 5.1.0
+ROTEIRIZZE TORNEIOS 5.2.1
 
-ATUALIZANDO DA VERSÃO 5.0 OU 5.0.1
-1. Exporte o backup JSON da competição e guarde o ZIP anterior.
-2. Interrompa os lançamentos e feche os painéis antigos em todos os aparelhos.
-3. No Supabase > SQL Editor, como postgres, execute TODO o arquivo
-   supabase/003_v51_logos.sql. Não repita o SQL 001 para esta atualização.
-4. Depois do sucesso, copie o conteúdo de Torneio-main para a raiz do GitHub,
-   substituindo os arquivos e mantendo assets e vendor. Inclua os novos scripts
-   features.js e draw-show.js. Não precisa instalar dependências nem fazer build.
-5. Aguarde a publicação, atualize os navegadores e confira a competição existente.
+AJUSTES ADICIONAIS DA 5.2.0
+Tabela de 30 duplas: 58 partidas, 14 confrontos iniciais e 2 biônicos, um em cada
+metade. Derivada da estrutura de 32 duplas com duas vagas de avanço automático,
+comprimidas sem criar partidas fictícias. Vencedores avançam linearmente dentro
+de cada metade; as quedas e cruzamentos da repescagem seguem a mesma estrutura.
+As tabelas de outras quantidades não foram modificadas.
+O aviso de cruzamento das semifinais foi retirado. A ação administrativa permanece
+somente quando houver uma alternativa que reduza reencontros.
+Resumo do sorteio: cabeçalho, lista rolável e controles ocupam áreas separadas.
+Os controles não ficam sobre os confrontos quando a lista é maior que a tela.
+Nenhum SQL adicional é necessário se a base 5.2 já está instalada.
 
-O SQL não refaz nem apaga sorteios ou resultados. Ele cria o bucket de logos,
-configura as permissões e atualiza a listagem. Abas antigas perdem a permissão
-para salvar até que carreguem a versão 5.1. Isso evita que descartem os novos campos.
+VERIFICAÇÃO E AJUSTES 5.2.1
+A página pública observada nesta revisão carregava scripts e estilos com v=5.1.0,
+logo-color.png como favicon e não carregava portal.js, viewport.js ou print-bracket.js.
+O ZIP 5.2 entregue anteriormente contém esses recursos e a tabela de 30 duplas.
+Não foi identificada perda desses recursos no ZIP. A versão publicada difere do pacote.
+A versão 5.2.1 usa novas referências de cache e exibe v5.2.1 no rodapé.
+Foi incluído também favicon.ico na raiz, além dos ícones da pasta assets.
+
+Foi corrigida uma falha real de estilo no resumo do sorteio: main herdava margin:auto,
+impedindo a área de jogos de respeitar a altura disponível. Agora a lista rola dentro
+da própria área, acima dos controles. Confirmado em navegador com 30 duplas em
+largura de computador e largura de 390px, sem sobreposição e com todos os 16 jogos
+de estreia, incluindo os dois biônicos contra Vencedor do jogo N.
+
+PUBLICAÇÃO
+1. Guarde o backup JSON das competições e uma cópia do repositório atual.
+2. Extraia este ZIP em uma pasta nova para não misturar arquivos de entregas antigas.
+3. Copie o CONTEÚDO de Torneio-main para a raiz servida pela hospedagem, substituindo
+   os HTML, JavaScript, styles.css e a pasta assets. Mantenha também vendor.
+   Não deixe os arquivos novos apenas em uma subpasta Torneio-main com os HTML
+   antigos ainda na raiz. Não há instalação ou build.
+4. Aguarde o deploy da hospedagem. Confirme a branch e o diretório publicados.
+5. Abra em janela anônima ou use Ctrl+Shift+R. Confira v5.2.1 no rodapé, o favicon,
+   o portal da página inicial e a opção 30 duplas ao cadastrar categoria nova.
+
+Não existe SQL novo na 5.2.1. Para quem já instalou a base 5.2 com o SQL 004,
+basta publicar os arquivos. Se o SQL 004 ainda não foi executado, ele continua
+necessário para listar os torneios na página inicial. Os arquivos do banco estão
+na pasta supabase; ela não precisa ser publicada na hospedagem.
+
+A conexão, os IDs, os sorteios e os resultados existentes não são modificados por
+esta atualização. Nenhum salvamento foi feito no Supabase de produção durante
+esta conferência. Os testes no navegador usaram uma competição fictícia local.
+
+COMO ATUALIZAR
+1. Exporte um backup JSON e guarde o ZIP anterior. Interrompa os lançamentos e
+   feche os painéis antigos durante a atualização.
+2. Se a versão 5.1 já foi instalada com o SQL 003, execute somente o arquivo
+   supabase/004_v52_portal.sql no SQL Editor do Supabase como postgres.
+   Se ainda estiver na 5.0 ou 5.0.1, execute primeiro 003_v51_logos.sql e depois 004.
+   Não repita o SQL 001 se a migração V5 já foi feita.
+3. Depois do sucesso, copie TODO o conteúdo de Torneio-main para a raiz do GitHub.
+   Preserve as pastas assets e vendor e todos os arquivos JavaScript, inclusive
+   viewport.js, print-bracket.js e portal.js. Não há build ou dependências no site.
+   A pasta supabase contém os comandos do banco; não precisa ser publicada no site.
+4. Aguarde a publicação e atualize os navegadores. Confira uma competição existente,
+   seus resultados, o novo portal e a impressão antes de retomar os lançamentos.
+
+O SQL 004 cria somente a função de catálogo público e suas permissões. Não apaga,
+não sorteia novamente e não altera resultados ou links das competições existentes.
 O site de produção e o Supabase não foram alterados por nós.
+
+NOVO NA 5.2.0
+IMPRESSÃO: escolha uma categoria sorteada e clique em Imprimir tabela completa.
+A folha contém todos os jogos da categoria, inclusive semifinais, final e terceiro
+lugar, independentemente do zoom ou da visualização atual. O formato é A4 paisagem,
+uma página. No diálogo de impressão, use escala padrão e desative cabeçalhos e
+rodapés do navegador. Em tabelas grandes, os nomes ficam menores para caber tudo.
+
+ZOOM: pinça com dois dedos mantém o ponto ampliado sob os dedos. Arraste com um
+dedo ou com o mouse para navegar, com desaceleração ao soltar. Ctrl + rolagem
+amplia no computador. Ver tudo ajusta a tabela; Ler nomes volta ao começo em 100%.
+A posição é preservada quando chegam resultados. Os gestos ficam dentro da tabela;
+fora dela, a página continua rolando normalmente.
+
+PORTAL: index.html sem token agora lista os torneios publicados, com busca e filtros
+por andamento, preparação e finalizados. Os que estão em andamento vêm primeiro.
+Registros zerados ou não publicados não aparecem. Sem eventos, a lista fica vazia
+com a mensagem Não há competições no momento. Os links individuais são mantidos.
+A lista consulta somente metadados a cada 30 segundos quando a aba está visível,
+sem baixar todas as tabelas de jogos. Limite de 100 eventos por consulta.
+
+FAVICON: o ícone do navegador foi substituído pela imagem do troféu enviada.
+O navegador pode precisar de atualização forçada para descartar o ícone antigo.
+
+LOGO: escolher imagem mostra uma prévia local ANTES de enviar. Clique em Salvar logo
+para confirmar. Depois do salvamento no servidor, aparece Logo salva com sucesso.
+Se falhar, a prévia continua disponível e o painel indica que não foi salva.
+Descartar prévia mantém a logo anterior. A imagem continua sendo da competição,
+em formato 1:1, PNG/JPG/WebP de até 2 MB.
 
 MENU
 Cabeçalho fixo e barra lateral com Acompanhar, Chaveamento e Minhas competições.
@@ -47,22 +125,14 @@ A substituição remove o arquivo anterior depois de salvar o novo caminho.
 O backup JSON guarda o caminho da imagem, não uma cópia do arquivo. Guarde também
 sua logo original se quiser restaurá-la depois de removê-la ou substituí-la.
 
-SEM COMPETIÇÕES
-A página inicial mostra Não há competições no momento, com os indicadores zerados,
-quando não existe competição criada. Registros que foram zerados não aparecem
-como eventos em espera. Uma competição realmente criada, ainda sem sorteio,
-continua listada como Em preparação. Não há criação automática de evento fictício.
-O endereço público inicial mantém a competição principal, se ela existir. Caso ela
-não exista ou esteja zerada, usa outro evento publicado disponível. Links públicos
-individuais continuam associados a suas próprias competições.
-
 SORTEIO PARA LIVE
 Ao clicar Sortear e abrir chaveamento, o sorteio é feito e salvo uma única vez.
 Em seguida abre a apresentação dos confrontos iniciais com animação leve.
 Use Revelar primeiro confronto e Próximo confronto para controlar o ritmo da live.
 Reproduzir avança automaticamente; o mesmo botão pausa. Ver todos abre o resumo.
-As duplas cuja estreia depende de um vencedor aparecem em uma seção separada,
-sem inventar confrontos ainda indefinidos. Biônicos recebem a identificação.
+Os jogos de estreia dos biônicos também são revelados e aparecem no resumo,
+com o número real do jogo e a dupla contra Vencedor do jogo N quando o adversário
+ainda depende de outra partida. Biônicos recebem a identificação.
 Tela cheia amplia a apresentação. Ver chaveamento encerra e abre a tabela.
 A tela respeita a preferência de movimento reduzido do aparelho.
 Apresentar sorteio, dentro do chaveamento, repete somente a exibição do sorteio
@@ -77,17 +147,17 @@ Convites e recuperação por e-mail precisam de um serviço de envio configurado
 Criar manualmente uma conta confirmada e Alterar senha dentro da conta continuam
 funcionando sem envio de e-mail. Consulte CONFIGURAR-EMAIL-SUPABASE.txt.
 
-TESTES E LIMITES DE VERIFICAÇÃO
-88 testes JavaScript aprovados, incluindo tabelas, correções, semifinais e logos.
-14 verificações PostgreSQL locais aprovadas para o SQL complementar.
-Conferidos no navegador: apresentação e resumo do sorteio, chegada ao chaveamento,
-prévia/aplicação das semifinais, estado vazio, menu móvel e exibição da logo.
-O upload de imagem pelo navegador foi recusado pela etapa de aprovação e não foi
-realizado. O envio real da logo precisa ser conferido após instalar em seu Supabase.
-Nenhum dado real foi enviado ou alterado por nós.
-Para repetir os testes JavaScript com Node.js: node --test tests/*.test.js
+
+VALIDAÇÃO DA ENTREGA
+101 testes JavaScript aprovados, incluindo tabelas completas, matemática da pinça,
+prévia e confirmação de logos, correções de resultados e acesso por conta.
+21 verificações PostgreSQL locais aprovadas, incluindo permissões, isolamento,
+catálogo público, dados antigos e repetição do SQL sem substituir competições.
+Portal, navegação, zoom, arraste e tabela vetorial de 32 duplas conferidos em navegador.
+O diálogo de impressão não abriu no navegador de teste: confirme a prévia de uma
+página no seu computador. Pinça em aparelho físico e envio real da logo ao Storage
+não foram executados nesta validação; os fluxos foram testados com simulação local.
+Para repetir a suíte: node --test tests/*.test.js
 
 INSTALAÇÃO NOVA
-Se ainda não tem a migração V5, leia INSTALACAO-V5.md. Primeiro configure o SQL 001,
-com sua conta administrativa confirmada. Depois execute 003_v51_logos.sql e publique
-os arquivos desta versão. Não use uma versão antiga para editar as novas categorias.
+Leia INSTALACAO-V5.md. Execute 001, 003 e 004 nessa ordem antes de publicar.

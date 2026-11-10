@@ -30,3 +30,5 @@ test('18 duplas: caminhos superiores e inferiores seguem a planilha',()=>{
  const ref29=models[18].games.find(g=>g.id===29).refs;assert.ok(ref29.includes('P26'));
 });
 test('18 duplas: 4 entram na preliminar e 14 são biônicos',()=>{const {entrySlots}=L.create(models[18].games);assert.equal(entrySlots.filter(t=>t.skipped===0).length,4);assert.equal(entrySlots.filter(t=>t.skipped>0).length,14);});
+
+test('30 duplas: 58 jogos e dois biônicos distribuídos entre as metades',()=>{const model=models[30],layout=L.create(model.games);assert.equal(model.games.length,58);assert.equal(model.games.filter(g=>g.side==='W').length,28);assert.equal(model.games.filter(g=>g.side==='L').length,26);const byes=layout.entrySlots.filter(t=>t.skipped>0);assert.equal(byes.length,2);assert.deepEqual(byes.map(t=>t.slot).sort((a,b)=>a-b),[1,16]);const opening=model.games.filter(g=>g.side==='W'&&g.refs.every(r=>r[0]==='T'));assert.equal(opening.length,14);assert.equal(opening.filter(g=>layout.nodes[g.id].half===0).length,7);assert.equal(opening.filter(g=>layout.nodes[g.id].half===1).length,7);});
