@@ -1,9 +1,62 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guia 5.2.1 | Roteirizze Torneios</title><link rel="icon" href="assets/favicon.ico?v=5.2.1"><link rel="stylesheet" href="styles.css?v=5.2.1"></head><body><main style="max-width:950px;margin:24px auto;padding:20px"><section class="hero"><div class="copy"><p class="kicker">Roteirizze Torneios · 5.2.1</p><h1>Todos os torneios em um só lugar.</h1><p>Impressão completa, zoom livre e prévia da logo.</p><a class="btn primary" href="admin.html">Abrir organização</a></div></section><section class="panel"><p style="white-space:pre-line">VERIFICAÇÃO E AJUSTES 5.2.1
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guia 5.2.3 | Roteirizze Torneios</title><link rel="icon" href="assets/favicon.ico?v=5.2.3"><link rel="stylesheet" href="styles.css?v=5.2.3"></head><body><main style="max-width:950px;margin:24px auto;padding:20px"><section class="hero"><div class="copy"><p class="kicker">Roteirizze Torneios · 5.2.3</p><h1>Todos os torneios em um só lugar.</h1><p>Impressão completa, zoom livre e prévia da logo.</p><a class="btn primary" href="admin.html">Abrir organização</a></div></section><section class="panel"><p style="white-space:pre-line">ROTEIRIZZE TORNEIOS 5.2.3
+
+ÚLTIMA CATEGORIA UTILIZADA
+O painel lembra a categoria selecionada e a categoria do último jogo salvo,
+iniciado, reaberto, corrigido ou com quadra definida. Ao retornar à competição
+sem uma categoria explícita no link, ela volta a ser a categoria atual.
+O seletor Escolher jogo mostra primeiro as partidas dessa categoria, mantendo
+as demais disponíveis. Nenhuma partida é escolhida automaticamente.
+
+A memória é local ao navegador, separada por competição e por conta. Um link
+com categoria explícita continua abrindo a categoria pedida. Se uma categoria
+for excluída, o painel usa uma categoria válida. Navegação pública e painel
+administrativo têm preferências separadas. Limpar os dados do navegador apaga
+essa preferência. Falhas de armazenamento não bloqueiam o uso do painel.
+A categoria de um lançamento só é lembrada após o salvamento no servidor.
+
+113 testes JavaScript aprovados. Fluxo com duas categorias conferido em navegador:
+resultado na segunda categoria, retorno sem categoria na URL e prioridade da
+categoria anterior na lista de jogos. Conferência com dados fictícios locais.
+
+Publique o conteúdo completo de Torneio-main e confira v5.2.3 no rodapé.
+Inclua category-memory.js, além dos demais arquivos, assets e vendor.
+Não existe SQL adicional para quem já instalou a base 5.2.
+Sorteios, resultados e regras foram preservados. Nenhum dado de produção foi
+modificado nesta entrega.
+</p></section><section class="panel"><p style="white-space:pre-line">ROTEIRIZZE TORNEIOS 5.2.3
+
+NAVEGAÇÃO DA TABELA
+O arraste move a tabela diretamente na distância percorrida pelo dedo ou mouse,
+inclusive quando a tabela inteira cabe na área. Não há inércia ao soltar.
+A pinça mantém o ponto entre os dois dedos. Ao retirar um dedo, o outro continua
+o arraste a partir da posição atual. As alterações são desenhadas uma vez por quadro,
+sem redimensionar a superfície de rolagem a cada movimento.
+Tela cheia utiliza a área real disponível do aparelho, sem escala intermediária de
+1920 x 1080. Ver tudo reenquadra a tabela; Ler nomes abre o começo em 100%.
+No computador, roda/trackpad movem a tabela; Ctrl + roda ou pinça do trackpad dão zoom.
+As setas do teclado movem a tabela quando sua área está focada.
+
+VALIDAÇÃO
+107 testes JavaScript aprovados. Incluem pinça com dois pontos, transição de dois
+para um dedo, cancelamento de gesto, zoom ancorado, pintura por quadro, ausência
+de inércia e arraste quando a tabela cabe inteira na tela.
+Arraste, zoom por controles e tela cheia conferidos no navegador de computador;
+arraste também conferido em uma área de 390px. Pinça física no celular não foi
+executada; o comportamento de dois dedos foi validado por simulação.
+
+PUBLICAÇÃO
+Este é um pacote completo. Publique o conteúdo de Torneio-main na raiz servida,
+incluindo assets e vendor. Aguarde o deploy, atualize a página e confira v5.2.3 no
+rodapé. Não há SQL adicional para quem já instalou a base 5.2. O SQL 004 continua
+necessário para o portal se ainda não foi executado.
+Conexão, regras, categorias, posições sorteadas e resultados foram preservados.
+Nenhum dado de produção foi modificado nesta entrega.
+</p></section><section class="panel"><p style="white-space:pre-line">VERIFICAÇÃO E AJUSTES 5.2.3
 A página pública observada nesta revisão carregava scripts e estilos com v=5.1.0,
 logo-color.png como favicon e não carregava portal.js, viewport.js ou print-bracket.js.
 O ZIP 5.2 entregue anteriormente contém esses recursos e a tabela de 30 duplas.
 Não foi identificada perda desses recursos no ZIP. A versão publicada difere do pacote.
-A versão 5.2.1 usa novas referências de cache e exibe v5.2.1 no rodapé.
+A versão 5.2.3 usa novas referências de cache e exibe v5.2.3 no rodapé.
 Foi incluído também favicon.ico na raiz, além dos ícones da pasta assets.
 
 Foi corrigida uma falha real de estilo no resumo do sorteio: main herdava margin:auto,
@@ -20,10 +73,10 @@ PUBLICAÇÃO
    Não deixe os arquivos novos apenas em uma subpasta Torneio-main com os HTML
    antigos ainda na raiz. Não há instalação ou build.
 4. Aguarde o deploy da hospedagem. Confirme a branch e o diretório publicados.
-5. Abra em janela anônima ou use Ctrl+Shift+R. Confira v5.2.1 no rodapé, o favicon,
+5. Abra em janela anônima ou use Ctrl+Shift+R. Confira v5.2.3 no rodapé, o favicon,
    o portal da página inicial e a opção 30 duplas ao cadastrar categoria nova.
 
-Não existe SQL novo na 5.2.1. Para quem já instalou a base 5.2 com o SQL 004,
+Não existe SQL novo na 5.2.3. Para quem já instalou a base 5.2 com o SQL 004,
 basta publicar os arquivos. Se o SQL 004 ainda não foi executado, ele continua
 necessário para listar os torneios na página inicial. Os arquivos do banco estão
 na pasta supabase; ela não precisa ser publicada na hospedagem.
@@ -31,7 +84,7 @@ na pasta supabase; ela não precisa ser publicada na hospedagem.
 A conexão, os IDs, os sorteios e os resultados existentes não são modificados por
 esta atualização. Nenhum salvamento foi feito no Supabase de produção durante
 esta conferência. Os testes no navegador usaram uma competição fictícia local.
-</p></section><section class="panel"><p style="white-space:pre-line">AJUSTES ADICIONAIS DA 5.2.1
+</p></section><section class="panel"><p style="white-space:pre-line">AJUSTES ADICIONAIS DA 5.2.3
 Tabela de 30 duplas: 58 partidas, 14 confrontos iniciais e 2 biônicos, um em cada
 metade. Derivada da estrutura de 32 duplas com duas vagas de avanço automático,
 comprimidas sem criar partidas fictícias. Vencedores avançam linearmente dentro
@@ -57,7 +110,7 @@ Nenhum SQL adicional é necessário se a base 5.2 já está instalada.
 4. Aguarde a publicação e atualize os navegadores. Confira uma competição existente,
    seus resultados, o novo portal e a impressão antes de retomar os lançamentos.</p></section><section class="panel"><p style="white-space:pre-line">O SQL 004 cria somente a função de catálogo público e suas permissões. Não apaga,
 não sorteia novamente e não altera resultados ou links das competições existentes.
-O site de produção e o Supabase não foram alterados por nós.</p></section><section class="panel"><p style="white-space:pre-line">NOVO NA 5.2.1
+O site de produção e o Supabase não foram alterados por nós.</p></section><section class="panel"><p style="white-space:pre-line">NOVO NA 5.2.3
 IMPRESSÃO: escolha uma categoria sorteada e clique em Imprimir tabela completa.
 A folha contém todos os jogos da categoria, inclusive semifinais, final e terceiro
 lugar, independentemente do zoom ou da visualização atual. O formato é A4 paisagem,
@@ -122,7 +175,7 @@ Convites e recuperação por e-mail precisam de um serviço de envio configurado
 Criar manualmente uma conta confirmada e Alterar senha dentro da conta continuam
 funcionando sem envio de e-mail. Consulte CONFIGURAR-EMAIL-SUPABASE.txt.</p></section><section class="panel"><p style="white-space:pre-line">
 VALIDAÇÃO DA ENTREGA
-101 testes JavaScript aprovados, incluindo tabelas completas, matemática da pinça,
+107 testes JavaScript aprovados, incluindo tabelas completas, matemática da pinça,
 prévia e confirmação de logos, correções de resultados e acesso por conta.
 21 verificações PostgreSQL locais aprovadas, incluindo permissões, isolamento,
 catálogo público, dados antigos e repetição do SQL sem substituir competições.

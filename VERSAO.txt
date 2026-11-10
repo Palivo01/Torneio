@@ -1,2 +1,2 @@
-Roteirizze Torneios 5.2.1
-Pacote completo com tabela de 30 duplas, portal público, zoom, impressão e apresentação com biônicos.
+Roteirizze Torneios 5.2.3
+Memória da categoria por competição e conta, neste navegador.

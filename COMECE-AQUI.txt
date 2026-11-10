@@ -1,4 +1,65 @@
-ROTEIRIZZE TORNEIOS 5.2.1
+ROTEIRIZZE TORNEIOS 5.2.3
+
+ÚLTIMA CATEGORIA UTILIZADA
+O painel lembra a categoria selecionada e a categoria do último jogo salvo,
+iniciado, reaberto, corrigido ou com quadra definida. Ao retornar à competição
+sem uma categoria explícita no link, ela volta a ser a categoria atual.
+O seletor Escolher jogo mostra primeiro as partidas dessa categoria, mantendo
+as demais disponíveis. Nenhuma partida é escolhida automaticamente.
+
+A memória é local ao navegador, separada por competição e por conta. Um link
+com categoria explícita continua abrindo a categoria pedida. Se uma categoria
+for excluída, o painel usa uma categoria válida. Navegação pública e painel
+administrativo têm preferências separadas. Limpar os dados do navegador apaga
+essa preferência. Falhas de armazenamento não bloqueiam o uso do painel.
+A categoria de um lançamento só é lembrada após o salvamento no servidor.
+
+113 testes JavaScript aprovados. Fluxo com duas categorias conferido em navegador:
+resultado na segunda categoria, retorno sem categoria na URL e prioridade da
+categoria anterior na lista de jogos. Conferência com dados fictícios locais.
+
+Publique o conteúdo completo de Torneio-main e confira v5.2.3 no rodapé.
+Inclua category-memory.js, além dos demais arquivos, assets e vendor.
+Não existe SQL adicional para quem já instalou a base 5.2.
+Sorteios, resultados e regras foram preservados. Nenhum dado de produção foi
+modificado nesta entrega.
+
+
+HISTÓRICO E GUIA
+
+ROTEIRIZZE TORNEIOS 5.2.2
+
+NAVEGAÇÃO DA TABELA
+O arraste move a tabela diretamente na distância percorrida pelo dedo ou mouse,
+inclusive quando a tabela inteira cabe na área. Não há inércia ao soltar.
+A pinça mantém o ponto entre os dois dedos. Ao retirar um dedo, o outro continua
+o arraste a partir da posição atual. As alterações são desenhadas uma vez por quadro,
+sem redimensionar a superfície de rolagem a cada movimento.
+Tela cheia utiliza a área real disponível do aparelho, sem escala intermediária de
+1920 x 1080. Ver tudo reenquadra a tabela; Ler nomes abre o começo em 100%.
+No computador, roda/trackpad movem a tabela; Ctrl + roda ou pinça do trackpad dão zoom.
+As setas do teclado movem a tabela quando sua área está focada.
+
+VALIDAÇÃO
+107 testes JavaScript aprovados. Incluem pinça com dois pontos, transição de dois
+para um dedo, cancelamento de gesto, zoom ancorado, pintura por quadro, ausência
+de inércia e arraste quando a tabela cabe inteira na tela.
+Arraste, zoom por controles e tela cheia conferidos no navegador de computador;
+arraste também conferido em uma área de 390px. Pinça física no celular não foi
+executada; o comportamento de dois dedos foi validado por simulação.
+
+PUBLICAÇÃO
+Este é um pacote completo. Publique o conteúdo de Torneio-main na raiz servida,
+incluindo assets e vendor. Aguarde o deploy, atualize a página e confira v5.2.2 no
+rodapé. Não há SQL adicional para quem já instalou a base 5.2. O SQL 004 continua
+necessário para o portal se ainda não foi executado.
+Conexão, regras, categorias, posições sorteadas e resultados foram preservados.
+Nenhum dado de produção foi modificado nesta entrega.
+
+
+HISTÓRICO E GUIA DA BASE
+
+ROTEIRIZZE TORNEIOS 5.2.2
 
 AJUSTES ADICIONAIS DA 5.2.0
 Tabela de 30 duplas: 58 partidas, 14 confrontos iniciais e 2 biônicos, um em cada
@@ -149,7 +210,7 @@ funcionando sem envio de e-mail. Consulte CONFIGURAR-EMAIL-SUPABASE.txt.
 
 
 VALIDAÇÃO DA ENTREGA
-101 testes JavaScript aprovados, incluindo tabelas completas, matemática da pinça,
+107 testes JavaScript aprovados, incluindo tabelas completas, matemática da pinça,
 prévia e confirmação de logos, correções de resultados e acesso por conta.
 21 verificações PostgreSQL locais aprovadas, incluindo permissões, isolamento,
 catálogo público, dados antigos e repetição do SQL sem substituir competições.

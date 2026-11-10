@@ -91,3 +91,6 @@
 
 /* Isola a altura da apresentação das margens globais de main. */
 .draw-shell>main{margin:0;height:100%;max-height:100%;align-self:stretch;min-width:0}
+
+/* A navegação move apenas uma camada composta, sem redimensionar a tabela. */
+.championship-scroll{position:relative;overflow:hidden!important;touch-action:none;-webkit-overflow-scrolling:auto;overflow-anchor:none}.bracket-surface{position:absolute;inset:0;width:100%!important;height:100%!important;overflow:hidden;contain:layout paint}.bracket-scale{left:0;top:0;transform-origin:0 0;will-change:transform;transition:none!important}.bracket-scale .match{touch-action:none}.championship-scroll *{-webkit-user-drag:none}
