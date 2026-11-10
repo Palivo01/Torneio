@@ -1,15 +1,37 @@
-<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guia 5.1.0 | Roteirizze Torneios</title><link rel="stylesheet" href="styles.css?v=5.1.0"></head><body><main style="max-width:950px;margin:24px auto;padding:20px"><section class="hero"><div class="copy"><p class="kicker">Roteirizze Torneios · 5.1.0</p><h1>O torneio começa no sorteio.</h1><p>Menu, logos, apresentação para live e análise das semifinais.</p><a class="btn primary" href="admin.html">Abrir organização</a></div></section><section class="panel"><p style="white-space:pre-line">ATUALIZANDO DA VERSÃO 5.0 OU 5.0.1
-1. Exporte o backup JSON da competição e guarde o ZIP anterior.
-2. Interrompa os lançamentos e feche os painéis antigos em todos os aparelhos.
-3. No Supabase &gt; SQL Editor, como postgres, execute TODO o arquivo
-   supabase/003_v51_logos.sql. Não repita o SQL 001 para esta atualização.
-4. Depois do sucesso, copie o conteúdo de Torneio-main para a raiz do GitHub,
-   substituindo os arquivos e mantendo assets e vendor. Inclua os novos scripts
-   features.js e draw-show.js. Não precisa instalar dependências nem fazer build.
-5. Aguarde a publicação, atualize os navegadores e confira a competição existente.</p></section><section class="panel"><p style="white-space:pre-line">O SQL não refaz nem apaga sorteios ou resultados. Ele cria o bucket de logos,
-configura as permissões e atualiza a listagem. Abas antigas perdem a permissão
-para salvar até que carreguem a versão 5.1. Isso evita que descartem os novos campos.
-O site de produção e o Supabase não foram alterados por nós.</p></section><section class="panel"><p style="white-space:pre-line">MENU
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Guia 5.2.0 | Roteirizze Torneios</title><link rel="icon" href="assets/favicon.ico?v=5.2.0"><link rel="stylesheet" href="styles.css?v=5.2.0"></head><body><main style="max-width:950px;margin:24px auto;padding:20px"><section class="hero"><div class="copy"><p class="kicker">Roteirizze Torneios · 5.2.0</p><h1>Todos os torneios em um só lugar.</h1><p>Impressão completa, zoom livre e prévia da logo.</p><a class="btn primary" href="admin.html">Abrir organização</a></div></section><section class="panel"><p style="white-space:pre-line">COMO ATUALIZAR
+1. Exporte um backup JSON e guarde o ZIP anterior. Interrompa os lançamentos e
+   feche os painéis antigos durante a atualização.
+2. Se a versão 5.1 já foi instalada com o SQL 003, execute somente o arquivo
+   supabase/004_v52_portal.sql no SQL Editor do Supabase como postgres.
+   Se ainda estiver na 5.0 ou 5.0.1, execute primeiro 003_v51_logos.sql e depois 004.
+   Não repita o SQL 001 se a migração V5 já foi feita.
+3. Depois do sucesso, copie TODO o conteúdo de Torneio-main para a raiz do GitHub.
+   Preserve as pastas assets e vendor e todos os arquivos JavaScript, inclusive
+   viewport.js, print-bracket.js e portal.js. Não há build ou dependências no site.
+   A pasta supabase contém os comandos do banco; não precisa ser publicada no site.
+4. Aguarde a publicação e atualize os navegadores. Confira uma competição existente,
+   seus resultados, o novo portal e a impressão antes de retomar os lançamentos.</p></section><section class="panel"><p style="white-space:pre-line">O SQL 004 cria somente a função de catálogo público e suas permissões. Não apaga,
+não sorteia novamente e não altera resultados ou links das competições existentes.
+O site de produção e o Supabase não foram alterados por nós.</p></section><section class="panel"><p style="white-space:pre-line">NOVO NA 5.2.0
+IMPRESSÃO: escolha uma categoria sorteada e clique em Imprimir tabela completa.
+A folha contém todos os jogos da categoria, inclusive semifinais, final e terceiro
+lugar, independentemente do zoom ou da visualização atual. O formato é A4 paisagem,
+uma página. No diálogo de impressão, use escala padrão e desative cabeçalhos e
+rodapés do navegador. Em tabelas grandes, os nomes ficam menores para caber tudo.</p></section><section class="panel"><p style="white-space:pre-line">ZOOM: pinça com dois dedos mantém o ponto ampliado sob os dedos. Arraste com um
+dedo ou com o mouse para navegar, com desaceleração ao soltar. Ctrl + rolagem
+amplia no computador. Ver tudo ajusta a tabela; Ler nomes volta ao começo em 100%.
+A posição é preservada quando chegam resultados. Os gestos ficam dentro da tabela;
+fora dela, a página continua rolando normalmente.</p></section><section class="panel"><p style="white-space:pre-line">PORTAL: index.html sem token agora lista os torneios publicados, com busca e filtros
+por andamento, preparação e finalizados. Os que estão em andamento vêm primeiro.
+Registros zerados ou não publicados não aparecem. Sem eventos, a lista fica vazia
+com a mensagem Não há competições no momento. Os links individuais são mantidos.
+A lista consulta somente metadados a cada 30 segundos quando a aba está visível,
+sem baixar todas as tabelas de jogos. Limite de 100 eventos por consulta.</p></section><section class="panel"><p style="white-space:pre-line">FAVICON: o ícone do navegador foi substituído pela imagem do troféu enviada.
+O navegador pode precisar de atualização forçada para descartar o ícone antigo.</p></section><section class="panel"><p style="white-space:pre-line">LOGO: escolher imagem mostra uma prévia local ANTES de enviar. Clique em Salvar logo
+para confirmar. Depois do salvamento no servidor, aparece Logo salva com sucesso.
+Se falhar, a prévia continua disponível e o painel indica que não foi salva.
+Descartar prévia mantém a logo anterior. A imagem continua sendo da competição,
+em formato 1:1, PNG/JPG/WebP de até 2 MB.</p></section><section class="panel"><p style="white-space:pre-line">MENU
 Cabeçalho fixo e barra lateral com Acompanhar, Chaveamento e Minhas competições.
 No celular, abra Menu para mostrar a barra lateral. Feche pelo botão, fundo ou Escape.</p></section><section class="panel"><p style="white-space:pre-line">SEMIFINAIS
 A análise compara as duas combinações possíveis entre os vencedores da chave
@@ -35,14 +57,7 @@ A imagem não é embutida no JSON que o acompanhamento consulta. A leitura da lo
 é pública; somente o responsável ou a administração geral podem enviar ou remover.
 A substituição remove o arquivo anterior depois de salvar o novo caminho.
 O backup JSON guarda o caminho da imagem, não uma cópia do arquivo. Guarde também
-sua logo original se quiser restaurá-la depois de removê-la ou substituí-la.</p></section><section class="panel"><p style="white-space:pre-line">SEM COMPETIÇÕES
-A página inicial mostra Não há competições no momento, com os indicadores zerados,
-quando não existe competição criada. Registros que foram zerados não aparecem
-como eventos em espera. Uma competição realmente criada, ainda sem sorteio,
-continua listada como Em preparação. Não há criação automática de evento fictício.
-O endereço público inicial mantém a competição principal, se ela existir. Caso ela
-não exista ou esteja zerada, usa outro evento publicado disponível. Links públicos
-individuais continuam associados a suas próprias competições.</p></section><section class="panel"><p style="white-space:pre-line">SORTEIO PARA LIVE
+sua logo original se quiser restaurá-la depois de removê-la ou substituí-la.</p></section><section class="panel"><p style="white-space:pre-line">SORTEIO PARA LIVE
 Ao clicar Sortear e abrir chaveamento, o sorteio é feito e salvo uma única vez.
 Em seguida abre a apresentação dos confrontos iniciais com animação leve.
 Use Revelar primeiro confronto e Próximo confronto para controlar o ritmo da live.
@@ -59,16 +74,16 @@ com registros preservados. A conta geral continua roteirizze@outlook.com.
 O novo SQL não altera contas, senhas, política de autorização ou configuração SMTP.
 Convites e recuperação por e-mail precisam de um serviço de envio configurado.
 Criar manualmente uma conta confirmada e Alterar senha dentro da conta continuam
-funcionando sem envio de e-mail. Consulte CONFIGURAR-EMAIL-SUPABASE.txt.</p></section><section class="panel"><p style="white-space:pre-line">TESTES E LIMITES DE VERIFICAÇÃO
-88 testes JavaScript aprovados, incluindo tabelas, correções, semifinais e logos.
-14 verificações PostgreSQL locais aprovadas para o SQL complementar.
-Conferidos no navegador: apresentação e resumo do sorteio, chegada ao chaveamento,
-prévia/aplicação das semifinais, estado vazio, menu móvel e exibição da logo.
-O upload de imagem pelo navegador foi recusado pela etapa de aprovação e não foi
-realizado. O envio real da logo precisa ser conferido após instalar em seu Supabase.
-Nenhum dado real foi enviado ou alterado por nós.
-Para repetir os testes JavaScript com Node.js: node --test tests/*.test.js</p></section><section class="panel"><p style="white-space:pre-line">INSTALAÇÃO NOVA
-Se ainda não tem a migração V5, leia INSTALACAO-V5.md. Primeiro configure o SQL 001,
-com sua conta administrativa confirmada. Depois execute 003_v51_logos.sql e publique
-os arquivos desta versão. Não use uma versão antiga para editar as novas categorias.
+funcionando sem envio de e-mail. Consulte CONFIGURAR-EMAIL-SUPABASE.txt.</p></section><section class="panel"><p style="white-space:pre-line">
+VALIDAÇÃO DA ENTREGA
+98 testes JavaScript aprovados, incluindo tabelas completas, matemática da pinça,
+prévia e confirmação de logos, correções de resultados e acesso por conta.
+21 verificações PostgreSQL locais aprovadas, incluindo permissões, isolamento,
+catálogo público, dados antigos e repetição do SQL sem substituir competições.
+Portal, navegação, zoom, arraste e tabela vetorial de 32 duplas conferidos em navegador.
+O diálogo de impressão não abriu no navegador de teste: confirme a prévia de uma
+página no seu computador. Pinça em aparelho físico e envio real da logo ao Storage
+não foram executados nesta validação; os fluxos foram testados com simulação local.
+Para repetir a suíte: node --test tests/*.test.js</p></section><section class="panel"><p style="white-space:pre-line">INSTALAÇÃO NOVA
+Leia INSTALACAO-V5.md. Execute 001, 003 e 004 nessa ordem antes de publicar.
 </p></section></main></body></html>
