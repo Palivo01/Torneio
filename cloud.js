@@ -9,12 +9,11 @@ function getClient(){
  if(!client){client=root.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce',storageKey:'torneio-auth-'+(cfg.tournamentId||'principal')}});client.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT'){session=null;role=null;root.dispatchEvent(new CustomEvent('torneio-signed-out'));}if(event==='PASSWORD_RECOVERY')root.dispatchEvent(new CustomEvent('torneio-recovery'));});}
  return client;
 }
-function backendError(error){if(!error)return;if(['42P01','PGRST202','PGRST205','42883'].includes(error.code))throw Error('Execute o SQL complementar necessário: 003 para a base 5.1 e 004 para o portal 5.2.');throw Error(error.message||'Não foi possível acessar o servidor.');}
+function backendError(error){if(!error)return;if(['42P01','PGRST202','PGRST205','42883'].includes(error.code))throw Error('Execute a migração SQL 003 da versão 5.1 antes de usar este painel.');throw Error(error.message||'Não foi possível acessar o servidor.');}
 async function rpc(name,args){const r=await getClient().rpc(name,args);backendError(r.error);return r.data;}
 const first=data=>Array.isArray(data)?data[0]||null:data;
 function configure(value){context={admin:Boolean(value.admin),id:value.id||null,token:value.token||null};revision=null;}
 async function identify(){const db=getClient(),stored=await db.auth.getSession();backendError(stored.error);session=stored.data.session;role=null;if(session){const checked=await db.auth.getUser();if(checked.error){await db.auth.signOut({scope:'local'});session=null;}else{const profile=await rpc('rt_profile');role=profile?.role||null;}}return {session,role,admin:Boolean(role)};}
-async function directory(){return await rpc('rt_public_directory')||[];}
 async function list(){if(!role)throw Error('Entre com uma conta autorizada.');return await rpc('rt_list_competitions_v51')||[];}
 async function load(){
  let row;
@@ -41,5 +40,5 @@ async function login(email,password){const r=await getClient().auth.signInWithPa
 async function logout(){const r=await getClient().auth.signOut({scope:'local'});backendError(r.error);session=null;role=null;}
 async function resetPassword(email){const redirect=new URL('auth.html',document.baseURI);redirect.search='';redirect.hash='';const r=await getClient().auth.resetPasswordForEmail(email,{redirectTo:redirect.href});backendError(r.error);}
 async function changePassword(password){const r=await getClient().auth.updateUser({password});backendError(r.error);}
-root.TorneioCloud={directory,logoUrl,uploadLogo,removeLogo,configured,configure,identify,list,load,loadIfChanged,create,save,organizers,setOrganizer,acceptRevision,login,logout,resetPassword,changePassword,get revision(){return revision;},get session(){return session;},get role(){return role;},get context(){return {...context};}};
+root.TorneioCloud={logoUrl,uploadLogo,removeLogo,configured,configure,identify,list,load,loadIfChanged,create,save,organizers,setOrganizer,acceptRevision,login,logout,resetPassword,changePassword,get revision(){return revision;},get session(){return session;},get role(){return role;},get context(){return {...context};}};
 })(window);

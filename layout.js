@@ -2,7 +2,7 @@
 'use strict';
 // Positions depend on the bracket's feeder tree, never on match-number order.
 function create(games,options={}){
- const width=options.width||236,pitch=options.pitch||228,cardHeight=options.cardHeight||176,gap=options.gap||74,step=width+gap,top=options.top??96,middleGap=options.middleGap??280;
+ const width=options.width||236,pitch=options.pitch||228,cardHeight=options.cardHeight||176,gap=options.gap||74,step=width+gap,top=96,middleGap=280;
  const byId=Object.fromEntries(games.map(g=>[g.id,g])),semis=games.filter(g=>g.side==='S').sort((a,b)=>a.id-b.id),nodes={},labels=[],entrySlots=[];
  const trees={W:[],L:[]},maxDepth={W:0,L:0};
  for(const side of ['W','L']){
