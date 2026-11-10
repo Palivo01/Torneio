@@ -1,3 +1,11 @@
+# Atualização para 5.1.0
+
+A versão 5.1.0 precisa do SQL complementar `supabase/003_v51_logos.sql`, mesmo para quem já instalou a V5. Faça backup, feche os painéis antigos, execute o arquivo completo como postgres e publique todos os arquivos atualizados. Não repita o SQL 001 se sua migração V5 já foi feita. Consulte `COMECE-AQUI.txt` para os recursos, as limitações da análise das semifinais e a validação da entrega.
+
+O restante abaixo descreve a instalação da base V5 e do acesso. Para instalação nova, execute também o SQL 003 depois do SQL 001.
+
+---
+
 # Instalação da versão 5.0.1
 
 **Se você já instalou a versão 5.0.0 e executou a migração, não precisa de outro SQL.** Publique os arquivos atualizados e siga `CONFIGURAR-EMAIL-SUPABASE.txt` para configurar as URLs e modelos de e-mail. O restante deste guia cobre a instalação inicial da V5.

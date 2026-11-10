@@ -1,62 +1,93 @@
-ROTEIRIZZE TORNEIOS 5.0.1
+ROTEIRIZZE TORNEIOS 5.1.0
 
-ATUALIZANDO DA VERSÃO 5.0.0
-Você já executou a migração SQL. Não precisa executar outro SQL.
-Publique os arquivos do site na raiz do GitHub, incluindo os quatro novos:
-auth.html, auth-flow.js, auth-page.js e auth-redirect.js.
-Mantenha assets e vendor. A conexão existente em config.js foi preservada.
-Não precisa instalar dependências ou fazer build.
+ATUALIZANDO DA VERSÃO 5.0 OU 5.0.1
+1. Exporte o backup JSON da competição e guarde o ZIP anterior.
+2. Interrompa os lançamentos e feche os painéis antigos em todos os aparelhos.
+3. No Supabase > SQL Editor, como postgres, execute TODO o arquivo
+   supabase/003_v51_logos.sql. Não repita o SQL 001 para esta atualização.
+4. Depois do sucesso, copie o conteúdo de Torneio-main para a raiz do GitHub,
+   substituindo os arquivos e mantendo assets e vendor. Inclua os novos scripts
+   features.js e draw-show.js. Não precisa instalar dependências nem fazer build.
+5. Aguarde a publicação, atualize os navegadores e confira a competição existente.
 
-Depois configure Authentication > URL Configuration e confira Email Templates
-conforme CONFIGURAR-EMAIL-SUPABASE.txt. A senha inicial agora pode ser criada
-pela própria pessoa no retorno do convite. Há telas de confirmação de e-mail,
-recuperação, link inválido ou expirado e alteração de senha dentro do painel.
+O SQL não refaz nem apaga sorteios ou resultados. Ele cria o bucket de logos,
+configura as permissões e atualiza a listagem. Abas antigas perdem a permissão
+para salvar até que carreguem a versão 5.1. Isso evita que descartem os novos campos.
+O site de produção e o Supabase não foram alterados por nós.
 
-INSTALAÇÃO NOVA OU ANTERIOR À V5
-Leia INSTALACAO-V5.md. O SQL original está em supabase e usa a conta
-administrativa roteirizze@outlook.com. A migração preserva o sorteio e os resultados.
-Se ela já foi executada, não a repita para instalar esta correção de autenticação.
+MENU
+Cabeçalho fixo e barra lateral com Acompanhar, Chaveamento e Minhas competições.
+No celular, abra Menu para mostrar a barra lateral. Feche pelo botão, fundo ou Escape.
 
-NOVIDADES
-- Várias competições simultâneas, cada uma com suas categorias, quadras e link público.
-- Painel com filtros de preparação, andamento e finalizadas.
-- Roteirizze acessa todas. Cada organizador autorizado acessa só as que criou.
-- Autorização por e-mail no painel geral, após criar ou convidar e confirmar a conta
-  no Supabase Authentication. O site nunca recebe a chave service_role.
-- Qualquer partida com as duas duplas definidas pode ser lançada ou iniciada.
-  Os blocos agora servem como referência, sem bloquear as próximas etapas.
-- Corrigir placar mantendo o vencedor preserva os demais resultados.
-- Trocar vencedor preserva os registros afetados, marcando-os Em revisão.
-  Jogos independentes continuam válidos. Nenhum placar é atribuído a novas duplas.
-- Consulta leve de revisão antes de baixar a competição. Acompanhamento público
-  a cada 10 segundos, ou 60 segundos ao terminar; pausa com a aba oculta.
+SEMIFINAIS
+A análise compara as duas combinações possíveis entre os vencedores da chave
+principal e os classificados da repescagem. O botão Analisar e cruzar aparece
+apenas quando trocar os classificados da repescagem reduz os reencontros.
+A prévia mostra os confrontos e a redução antes de Confirmar cruzamento.
+Nenhum jogo anterior é modificado. O sistema mantém um classificado de cada chave
+em cada semifinal e preserva a final e a disputa de terceiro lugar.
+Só pode aplicar antes de qualquer lançamento das semifinais ou decisões, inclusive
+atribuição de quadra. Se as duas combinações tiverem o mesmo número de reencontros,
+a tabela original é mantida. A análise não altera a repescagem nem promete evitar
+reencontros que já tenham ocorrido antes das semifinais.
+O cruzamento fica salvo na categoria, incluindo seu backup. Um novo sorteio volta
+à configuração original da tabela. Categorias antigas em formato dinâmico não
+recebem esta opção para preservar suas regras e resultados.
 
-COMO CORRIGIR UM RESULTADO
-Abra Gerenciar jogos e clique Corrigir na partida errada. Se a mudança trocar
-adversários de partidas já registradas, o painel apresenta o impacto antes de salvar.
-Depois, use Ver partidas em revisão. Em Revisar, aparecem as duplas e o placar
-antigos, além dos adversários previstos agora. O novo placar começa em branco.
-Confira as duplas, informe o resultado correto e marque a confirmação.
-Resolva primeiro as partidas de origem se ainda houver adversários indefinidos.
-Se o resultado original estava certo, restaurá-lo recupera automaticamente os
-registros preservados cujos participantes voltarem a corresponder.
-Não é possível validar como correto um jogo disputado por outras duplas.
-Se um jogo afetado estiver em quadra, reabra esse jogo antes de mudar a origem.
+LOGO POR COMPETIÇÃO
+Abra a competição em admin.html e use Logo da competição > Escolher imagem >
+Salvar logo. Aceita PNG, JPG e WebP de até 2 MB. A imagem é centralizada em um
+quadrado de 512 x 512 pixels, sem cortar, e otimizada antes do envio.
+A logo vale para a competição inteira: painel, cards da lista, acompanhamento,
+chaveamento e apresentação do sorteio. Não é uma imagem por categoria.
+O arquivo fica separado no Supabase Storage e seu caminho fica na competição.
+A imagem não é embutida no JSON que o acompanhamento consulta. A leitura da logo
+é pública; somente o responsável ou a administração geral podem enviar ou remover.
+A substituição remove o arquivo anterior depois de salvar o novo caminho.
+O backup JSON guarda o caminho da imagem, não uma cópia do arquivo. Guarde também
+sua logo original se quiser restaurá-la depois de removê-la ou substituí-la.
 
-RECURSOS ANTERIORES MANTIDOS
-Salvar cadastro sem sortear, editar nomes a qualquer momento, excluir categoria,
-Sortear novamente com SORTEAR, zerar com ZERAR e excluir com EXCLUIR.
-Novo sorteio apaga resultados apenas da categoria escolhida: não é uma correção.
-Zerar competição afeta apenas a competição aberta. Para começar outra, use Criar competição.
-Chave A em cima e B embaixo; vencedores à esquerda e repescagem à direita.
-Biônico identifica quem entra adiante na chave. As posições de 1º a 4º são destacadas.
-Categorias antigas já iniciadas mantêm cruzamentos e histórico existentes.
+SEM COMPETIÇÕES
+A página inicial mostra Não há competições no momento, com os indicadores zerados,
+quando não existe competição criada. Registros que foram zerados não aparecem
+como eventos em espera. Uma competição realmente criada, ainda sem sorteio,
+continua listada como Em preparação. Não há criação automática de evento fictício.
+O endereço público inicial mantém a competição principal, se ela existir. Caso ela
+não exista ou esteja zerada, usa outro evento publicado disponível. Links públicos
+individuais continuam associados a suas próprias competições.
 
-TESTES
-Com Node.js instalado, execute na pasta:
-node --test tests/*.test.js
-75 testes JavaScript aprovados nesta entrega. A migração V5 já foi validada
-anteriormente com 20 verificações em PostgreSQL local.
-O ambiente real do seu Supabase deve ser conferido após a instalação.
+SORTEIO PARA LIVE
+Ao clicar Sortear e abrir chaveamento, o sorteio é feito e salvo uma única vez.
+Em seguida abre a apresentação dos confrontos iniciais com animação leve.
+Use Revelar primeiro confronto e Próximo confronto para controlar o ritmo da live.
+Reproduzir avança automaticamente; o mesmo botão pausa. Ver todos abre o resumo.
+As duplas cuja estreia depende de um vencedor aparecem em uma seção separada,
+sem inventar confrontos ainda indefinidos. Biônicos recebem a identificação.
+Tela cheia amplia a apresentação. Ver chaveamento encerra e abre a tabela.
+A tela respeita a preferência de movimento reduzido do aparelho.
+Apresentar sorteio, dentro do chaveamento, repete somente a exibição do sorteio
+já salvo. Não sorteia outra vez, não troca adversários e não altera resultados.
 
-Consulte LEIA-ME.html e INSTALACAO-V5.md para os detalhes.
+DADOS E ACESSO
+Mantidos: várias competições, autorização por organizador, nomes editáveis,
+salvar sem sortear, exclusão de categoria, novo sorteio com SORTEAR e correções
+com registros preservados. A conta geral continua roteirizze@outlook.com.
+O novo SQL não altera contas, senhas, política de autorização ou configuração SMTP.
+Convites e recuperação por e-mail precisam de um serviço de envio configurado.
+Criar manualmente uma conta confirmada e Alterar senha dentro da conta continuam
+funcionando sem envio de e-mail. Consulte CONFIGURAR-EMAIL-SUPABASE.txt.
+
+TESTES E LIMITES DE VERIFICAÇÃO
+88 testes JavaScript aprovados, incluindo tabelas, correções, semifinais e logos.
+14 verificações PostgreSQL locais aprovadas para o SQL complementar.
+Conferidos no navegador: apresentação e resumo do sorteio, chegada ao chaveamento,
+prévia/aplicação das semifinais, estado vazio, menu móvel e exibição da logo.
+O upload de imagem pelo navegador foi recusado pela etapa de aprovação e não foi
+realizado. O envio real da logo precisa ser conferido após instalar em seu Supabase.
+Nenhum dado real foi enviado ou alterado por nós.
+Para repetir os testes JavaScript com Node.js: node --test tests/*.test.js
+
+INSTALAÇÃO NOVA
+Se ainda não tem a migração V5, leia INSTALACAO-V5.md. Primeiro configure o SQL 001,
+com sua conta administrativa confirmada. Depois execute 003_v51_logos.sql e publique
+os arquivos desta versão. Não use uma versão antiga para editar as novas categorias.

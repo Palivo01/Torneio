@@ -19,12 +19,12 @@ function saveTeams(c,name,count,teams){
 }
 function deleteCategory(comp,id){const c=comp.categories.find(c=>c.id===id);if(!c)throw Error('Categoria não encontrada.');if(Object.values(resolve(c)).some(m=>m.status==='live'))throw Error('Encerre ou reabra os jogos em quadra antes de excluir a categoria.');comp.categories=comp.categories.filter(c=>c.id!==id);return comp;}
 function randomIndex(max){if(typeof crypto==='undefined'||!crypto.getRandomValues)throw Error('Use um navegador atualizado para realizar o sorteio.');const a=new Uint32Array(1),limit=Math.floor(4294967296/max)*max;do{crypto.getRandomValues(a);}while(a[0]>=limit);return a[0]%max;}
-function draw(c){validateTeams(c);if(c.confirmed)throw Error('Zere a categoria para sortear novamente.');c.draw=c.teams.map(t=>t.id);for(let i=c.draw.length-1;i>0;i--){const j=randomIndex(i+1);[c.draw[i],c.draw[j]]=[c.draw[j],c.draw[i]];}c.drawAt=new Date().toISOString();c.results={};c.routes={};c.bracketMode='fixed';return c;}
+function draw(c){validateTeams(c);if(c.confirmed)throw Error('Zere a categoria para sortear novamente.');c.draw=c.teams.map(t=>t.id);for(let i=c.draw.length-1;i>0;i--){const j=randomIndex(i+1);[c.draw[i],c.draw[j]]=[c.draw[j],c.draw[i]];}c.drawAt=new Date().toISOString();c.semifinalCrossed=false;c.results={};c.routes={};c.bracketMode='fixed';return c;}
 const isFixed=c=>c.bracketMode==='fixed';
 // Match numbers follow the supplied tables. Final and bronze share one block.
 function blocks(c){const out=[];for(const g of [...models[c.count].games].sort((a,b)=>a.id-b.id)){const side=['B','F'].includes(g.side)?'D':g.side;let block=out[out.length-1];if(!block||block.side!==side){block={side,ids:[]};out.push(block);}block.ids.push(g.id);}return out;}
 function previousGames(c,id){const sequence=blocks(c),index=sequence.findIndex(b=>b.ids.includes(id));return sequence.slice(0,index).flatMap(b=>b.ids);}
-function graph(c){return models[c.count].games.map(g=>({...g,refs:isFixed(c)?g.refs:g.side==='L'?(c.routes[g.id]||['R','R']):g.side==='S'?(c.routes[g.id]||[g.refs[0],'Q']):g.refs}));}
+function graph(c){const semis=models[c.count].games.filter(g=>g.side==='S');return models[c.count].games.map(g=>({...g,refs:isFixed(c)?(g.side==='S'&&c.semifinalCrossed?[g.refs[0],semis.find(x=>x.id!==g.id).refs[1]]:g.refs):g.side==='L'?(c.routes[g.id]||['R','R']):g.side==='S'?(c.routes[g.id]||[g.refs[0],'Q']):g.refs}));}
 function order(c){const defs=graph(c),pending=[...defs],done=new Set(),out=[];while(pending.length){let changed=false;for(let i=0;i<pending.length;){const g=pending[i];if(g.refs.every(r=>!['V','P'].includes(r[0])||done.has(+r.slice(1)))){out.push(g);done.add(g.id);pending.splice(i,1);changed=true;}else i++;}if(!changed)throw Error('Cruzamento inválido ou circular.');}return out;}
 const validScore=r=>Array.isArray(r.score)&&r.score.length===2&&r.score.every(n=>Number.isInteger(n)&&n>=0&&n<=999)&&r.score[0]!==r.score[1];
 function resolve(c){
@@ -54,6 +54,19 @@ if(slots.length&&(!allW&&tickets.length<=2))return;
 for(const slot of slots){let best=null;for(let i=0;i<tickets.length;i++)for(let j=i+1;j<tickets.length;j++){const a=tickets[i],b=tickets[j];if(a.team===b.team||encountered(resolved,a.team,b.team))continue;const cost=half[a.team]===half[b.team]?1:0;if(!best||cost<best.cost)best={i,j,cost};}if(!best)break;const a=tickets[best.i],b=tickets[best.j];c.routes[slot.id]=[a.ref,b.ref];tickets=tickets.filter((t,i)=>i!==best.i&&i!==best.j);}
 if(losers.every(g=>resolve(c)[g.id].done)&&allW){const now=resolve(c),usedTickets=new Set(losers.flatMap(g=>c.routes[g.id]||[]));const qualifiers=Object.values(now).filter(g=>g.done&&['W','L'].includes(g.side)).map(g=>({ref:(g.side==='W'?'P':'V')+g.id,team:g.side==='W'?g.loser:g.winner})).filter(t=>!usedTickets.has(t.ref));if(qualifiers.length!==2)throw Error('Não foi possível definir os semifinalistas.');const semis=defs.filter(g=>g.side==='S');for(const s of semis){if(c.routes[s.id])continue;const wref=s.refs[0],winner=now[+wref.slice(1)].winner;let i=qualifiers.findIndex(t=>half[t.team]!==half[winner]);if(i<0)i=0;const ticket=qualifiers.splice(i,1)[0];c.routes[s.id]=[wref,ticket.ref];}}
 }
+function semifinalProposal(c){
+ const matches=resolve(c),semis=graph(c).filter(g=>g.side==='S'),locked=Object.values(matches).some(g=>['S','F','B'].includes(g.side)&&c.results[g.id]);
+ if(!isFixed(c)||semis.length!==2)return {available:false,reason:'A análise está disponível nas tabelas fixas.'};
+ if(locked)return {available:false,reason:'As semifinais ou decisões já possuem lançamentos. O cruzamento foi preservado.'};
+ const teams=semis.map(g=>matches[g.id].teams);
+ if(teams.flat().some(t=>!t))return {available:false,reason:'A análise será liberada quando os quatro semifinalistas estiverem definidos.'};
+ const history=Object.values(matches).filter(g=>g.done&&['W','L'].includes(g.side));
+ const seen=(a,b)=>history.some(g=>pairKey(...g.teams)===pairKey(a,b));
+ const current=teams.reduce((n,p)=>n+Number(seen(...p)),0),proposed=[[teams[0][0],teams[1][1]],[teams[1][0],teams[0][1]]],alternative=proposed.reduce((n,p)=>n+Number(seen(...p)),0);
+ return {available:alternative<current,current,alternative,proposed,ids:semis.map(g=>g.id),reason:alternative<current?'Este cruzamento reduz os reencontros nas semifinais.':current?'Não há uma combinação com menos reencontros entre os quatro classificados.':'As semifinais atuais já não repetem confrontos anteriores.'};
+}
+function crossSemifinals(c){const proposal=semifinalProposal(c);if(!proposal.available)throw Error(proposal.reason);c.semifinalCrossed=!c.semifinalCrossed;return c;}
+function openingDraw(c){if(!c.confirmed)throw Error('Confirme e salve o sorteio antes de apresentá-lo.');const games=graph(c).filter(g=>g.side==='W'&&g.refs.every(r=>r[0]==='T')).map(g=>({id:g.id,teams:g.refs.map(r=>c.draw[+r.slice(1)-1])}));const shown=new Set(games.flatMap(g=>g.teams));return {games,later:c.draw.filter(id=>!shown.has(id)),drawAt:c.drawAt};}
 function descendants(c,id){const found=new Set();let changed=true;while(changed){changed=false;for(const g of graph(c))if(!found.has(g.id)&&g.refs.some(ref=>['V','P'].includes(ref[0])&&(+ref.slice(1)===id||found.has(+ref.slice(1))))){found.add(g.id);changed=true;}}return [...found].filter(n=>n!==id);}
 function players(c,ids){return new Set(ids.flatMap(id=>{const t=c.teams.find(t=>t.id===id);return t?[normalize(t.a),normalize(t.b)]:[];}));}
 function active(comp){return comp.categories.flatMap(c=>Object.values(resolve(c)).filter(m=>m.status==='live').map(m=>({c,m,players:players(c,m.teams)})));}
@@ -95,11 +108,12 @@ function redrawCategory(c,confirmation){
  const candidate={...c};resetCategory(candidate);draw(candidate);candidate.confirmed=true;plan(candidate);
  Object.assign(c,candidate);return c;
 }
-function resetCategory(c){c.bracketMode='fixed';c.results={};c.routes={};c.draw=[];c.confirmed=false;c.drawAt=null;}
+function resetCategory(c){c.semifinalCrossed=false;c.bracketMode='fixed';c.results={};c.routes={};c.draw=[];c.confirmed=false;c.drawAt=null;}
 function validate(x){
  if(!x||x.version!==3)throw Error('Selecione um backup no formato V3.');
  if(typeof x.created!=='boolean'||typeof x.name!=='string'||!x.name.trim()||x.name.length>100||!Number.isInteger(x.courts)||x.courts<1||x.courts>3||!Array.isArray(x.categories)||x.categories.length>100)throw Error('Backup inválido.');
  const out=fresh();Object.assign(out,{created:x.created,name:x.name,courts:x.courts,updated:typeof x.updated==='string'&&Number.isFinite(Date.parse(x.updated))?x.updated:null});
+ if(x.logoPath!==undefined){if(typeof x.logoPath!=='string'||(x.logoPath&&!/^[a-zA-Z0-9_-]{1,80}\/[a-f0-9-]{36}\.(webp|png|jpg)$/.test(x.logoPath)))throw Error('Logo inválida.');out.logoPath=x.logoPath;}
  if(!out.created&&x.categories.length)throw Error('Competição inválida.');const categoryIds=new Set();
  for(const c of x.categories){
   if(!c||typeof c.id!=='string'||!c.id||categoryIds.has(c.id)||typeof c.name!=='string'||!c.name.trim()||c.name.length>80||!Number.isInteger(c.count)||!models[c.count]||!Array.isArray(c.teams)||c.teams.length!==c.count||typeof c.confirmed!=='boolean'||!Array.isArray(c.draw)||!c.results||typeof c.results!=='object'||Array.isArray(c.results)||!c.routes||typeof c.routes!=='object'||Array.isArray(c.routes))throw Error('Categoria inválida.');
@@ -107,6 +121,7 @@ function validate(x){
   if(c.bracketMode!==undefined&&!['fixed','legacy'].includes(c.bracketMode))throw Error('Formato de chaveamento inválido.');
   clean.bracketMode=c.bracketMode==='fixed'||(!Object.keys(c.results).length&&!Object.keys(c.routes).length)?'fixed':'legacy';
   if(isFixed(clean)&&Object.keys(c.routes).length)throw Error('A tabela fixa não aceita cruzamentos dinâmicos.');
+  if(c.semifinalCrossed!==undefined&&typeof c.semifinalCrossed!=='boolean')throw Error('Cruzamento de semifinal inválido.');if(c.semifinalCrossed&&!isFixed(clean))throw Error('Cruzamento disponível apenas na tabela fixa.');if(c.semifinalCrossed!==undefined)clean.semifinalCrossed=c.semifinalCrossed;
   clean.teams=[];const ids=new Set();
   for(const t of c.teams){if(!t||typeof t.id!=='string'||!t.id||ids.has(t.id)||typeof t.a!=='string'||typeof t.b!=='string'||t.a.length>60||t.b.length>60)throw Error('Dupla inválida.');ids.add(t.id);clean.teams.push({id:t.id,a:t.a,b:t.b});}
   if(c.draw.length){if(c.draw.length!==c.count||new Set(c.draw).size!==c.count||!c.draw.every(id=>ids.has(id)))throw Error('Sorteio inválido.');clean.draw=[...c.draw];validateTeams(clean);}else if(c.confirmed)throw Error('Categoria sem sorteio.');
@@ -139,5 +154,5 @@ function validate(x){
  const lives=active(out);for(let i=0;i<lives.length;i++)for(let j=i+1;j<lives.length;j++)if(lives[i].m.court===lives[j].m.court||[...lives[i].players].some(p=>lives[j].players.has(p)))throw Error('Há jogos simultâneos incompatíveis.');
  return out;
 }
-const api={models,uid,normalize,fresh,category,teamName,validateTeams,saveTeams,deleteCategory,draw,isFixed,blocks,previousGames,graph,order,resolve,plan,descendants,players,active,availability,previewChange,mutate,assign,competitionState,redrawCategory,resetCategory,validate,encountered,pairKey};if(typeof module!=='undefined')module.exports=api;else root.Arena=api;
+const api={semifinalProposal,crossSemifinals,openingDraw,models,uid,normalize,fresh,category,teamName,validateTeams,saveTeams,deleteCategory,draw,isFixed,blocks,previousGames,graph,order,resolve,plan,descendants,players,active,availability,previewChange,mutate,assign,competitionState,redrawCategory,resetCategory,validate,encountered,pairKey};if(typeof module!=='undefined')module.exports=api;else root.Arena=api;
 })(typeof window!=='undefined'?window:globalThis);

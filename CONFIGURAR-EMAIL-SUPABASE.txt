@@ -1,7 +1,8 @@
-ROTEIRIZZE TORNEIOS 5.0.1
+ROTEIRIZZE TORNEIOS 5.1.0
 CONVITES, CONFIRMAÇÃO DE E-MAIL E SENHAS
 
-Se a versão 5.0.0 já foi instalada, não precisa executar SQL novamente.
+As configurações de e-mail abaixo não exigem SQL. A atualização 5.1.0 exige
+o SQL 003 das logos, conforme COMECE-AQUI.txt.
 Esta atualização altera os arquivos do site e a configuração de URLs do Auth.
 Não refaz sorteio nem altera dados das competições.
 
@@ -9,7 +10,7 @@ Não refaz sorteio nem altera dados das competições.
 Substitua o conteúdo da raiz do repositório pelo conteúdo de Torneio-main.
 Inclua auth.html, auth-page.js, auth-flow.js e auth-redirect.js, além dos arquivos
 atualizados. Mantenha assets e vendor. Aguarde a publicação da hospedagem.
-A pasta supabase contém a migração já usada na versão 5.0.0; não a execute de novo.
+Para esta atualização, siga o SQL 003. Não repita o SQL 001 se já instalou a V5.
 
 2. CONFIGURE O SUPABASE
 Abra Authentication > URL Configuration.
@@ -76,3 +77,9 @@ Referências oficiais:
 https://supabase.com/docs/guides/auth/redirect-urls
 https://supabase.com/docs/guides/auth/auth-email-templates
 https://supabase.com/docs/reference/javascript/auth-resetpasswordforemail
+
+ENVIO DE E-MAIL
+Sem SMTP próprio, o envio padrão do Supabase é restrito aos endereços da equipe
+do projeto. Para convidar outros organizadores ou recuperar suas senhas por e-mail,
+configure um serviço de envio. Criar manualmente uma conta confirmada e usar
+Alterar senha depois do login não exige envio de e-mail.
