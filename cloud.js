@@ -9,7 +9,7 @@ function getClient(){
  if(!client){client=root.supabase.createClient(cfg.supabaseUrl,cfg.supabasePublishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true,flowType:'pkce',storageKey:'torneio-auth-'+(cfg.tournamentId||'principal')}});client.auth.onAuthStateChange(event=>{if(event==='SIGNED_OUT'){session=null;role=null;root.dispatchEvent(new CustomEvent('torneio-signed-out'));}if(event==='PASSWORD_RECOVERY')root.dispatchEvent(new CustomEvent('torneio-recovery'));});}
  return client;
 }
-function backendError(error){if(!error)return;if(['42P01','PGRST202','PGRST205','42883'].includes(error.code))throw Error('Execute o SQL complementar necessário: 003 para a base 5.1 e 004 para o portal 5.2.');throw Error(error.message||'Não foi possível acessar o servidor.');}
+function backendError(error){if(!error)return;if(['42P01','PGRST202','PGRST205','42883'].includes(error.code))throw Error('Execute o SQL complementar necessário: 003 para logos, 004 para o portal e 005 para a versão 5.3.');throw Error(error.message||'Não foi possível acessar o servidor.');}
 async function rpc(name,args){const r=await getClient().rpc(name,args);backendError(r.error);return r.data;}
 const first=data=>Array.isArray(data)?data[0]||null:data;
 function configure(value){context={admin:Boolean(value.admin),id:value.id||null,token:value.token||null};revision=null;}
@@ -18,8 +18,8 @@ async function directory(){return await rpc('rt_public_directory')||[];}
 async function list(){if(!role)throw Error('Entre com uma conta autorizada.');return await rpc('rt_list_competitions_v51')||[];}
 async function load(){
  let row;
- if(context.admin){if(!context.id)return null;row=first(await rpc('rt_get_competition',{p_id:context.id}));}
- else{if(!context.token)context.token=await rpc('rt_default_public');if(!context.token)return null;row=first(await rpc('rt_public_competition',{p_token:context.token}));}
+ if(context.admin){if(!context.id)return null;row=first(await rpc('rt_get_competition_v53',{p_id:context.id}));}
+ else{if(!context.token)context.token=await rpc('rt_default_public');if(!context.token)return null;row=first(await rpc('rt_public_competition_v53',{p_token:context.token}));}
  if(!row)throw Error('Competição não encontrada ou acompanhamento indisponível.');
  context.id=row.id;if(row.public_token)context.token=row.public_token;return row;
 }
@@ -31,7 +31,7 @@ async function loadIfChanged(){
  return load();
 }
 async function create(payload,requestId){const row=first(await rpc('rt_create_competition',{p_payload:payload,p_id:requestId}));if(!row?.id)throw Error('Não foi possível criar a competição.');return row;}
-async function save(payload){if(!session||!role||!context.admin||!context.id)throw Error('Entre com uma conta autorizada para salvar.');const next=await rpc('rt_save_competition_v51',{p_id:context.id,p_payload:payload,p_expected_revision:revision,p_state:root.Arena.competitionState(payload)});acceptRevision(next);return revision;}
+async function save(payload){if(!session||!role||!context.admin||!context.id)throw Error('Entre com uma conta autorizada para salvar.');const next=await rpc('rt_save_competition_v53',{p_id:context.id,p_payload:payload,p_expected_revision:revision,p_state:root.Arena.competitionState(payload)});acceptRevision(next);return revision;}
 async function organizers(){return await rpc('rt_list_organizers')||[];}
 async function setOrganizer(email,active){return rpc('rt_set_organizer',{p_email:email,p_active:active});}
 function logoUrl(path){if(!path||!/^[a-zA-Z0-9_-]{1,80}\/[a-f0-9-]{36}\.(webp|png|jpg)$/.test(path))return '';return cfg.supabaseUrl.replace(/\/$/,'')+'/storage/v1/object/public/competition-logos/'+path;}

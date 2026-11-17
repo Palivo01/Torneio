@@ -2,7 +2,7 @@
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const A=require('../engine.js');
-function fixture(n=18){const comp=A.fresh();comp.created=true;comp.courts=3;const c=A.category('Categoria',n);c.teams.forEach((t,i)=>{t.a='Atleta '+(2*i+1);t.b='Atleta '+(2*i+2);});c.draw=c.teams.map(t=>t.id);c.confirmed=true;comp.categories=[c];return {comp,c};}
+function fixture(n=18){const comp=A.fresh();comp.created=true;comp.courts=3;const c=A.category('Categoria',n);c.routingVersion=1;c.teams.forEach((t,i)=>{t.a='Atleta '+(2*i+1);t.b='Atleta '+(2*i+2);});c.draw=c.teams.map(t=>t.id);c.confirmed=true;comp.categories=[c];return {comp,c};}
 function finish(comp,c,id,winner=0){A.mutate(comp,c,id,{status:'done',court:1,score:winner?[10,18]:[18,10]});}
 const ready=c=>Object.values(A.resolve(c)).filter(g=>g.status==='ready').map(g=>g.id);
 test('18 duplas: cruzamentos fixos e liberdade para qualquer partida definida',()=>{

@@ -1,2 +1,2 @@
-Roteirizze Torneios 5.2.4
-Arraste com um dedo corrigido.
+Roteirizze Torneios 6.0.0
+Tabelas completas de 6 a 32 duplas, incluindo 25, 26, 27, 29 e 31.

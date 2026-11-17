@@ -1,3 +1,15 @@
+# Atualização 6.0.0
+
+Leia `ATUALIZACAO-6.0.0.txt`. A versão inclui todas as tabelas de 6 a 32 duplas. Se o SQL 005 da 5.3.0 já foi executado, não há SQL adicional. Se ainda usa 5.2.4, execute `supabase/005_v53_crossings.sql` antes de publicar. Sorteios e resultados existentes permanecem preservados.
+
+As instruções abaixo são o histórico de instalação e atualização das versões anteriores.
+
+# Atualização 5.3.0
+
+Para atualizar uma instalação 5.2.4, siga `ATUALIZACAO-5.3.0.txt`: execute apenas o SQL 005, publique o pacote completo e atualize os aparelhos. Categorias antigas não recebem cruzamentos retroativos. A nova regra vale para novos sorteios.
+
+O guia abaixo mantém as instruções de instalação da base e o histórico das funcionalidades. Após instalar 001, 003 e 004, instale também `supabase/005_v53_crossings.sql` antes de usar os arquivos 5.3.
+
 # Revisão 5.2.1
 
 Leia `ATUALIZACAO-5.2.1.txt`. Não há SQL adicional para quem já instalou 5.2.

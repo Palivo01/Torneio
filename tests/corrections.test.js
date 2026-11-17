@@ -1,6 +1,6 @@
 'use strict';
 const {test}=require('node:test'),assert=require('node:assert/strict'),A=require('../engine.js');
-function fixture(n=18){const comp=A.fresh();comp.created=true;comp.courts=3;const c=A.category('Categoria',n);c.teams.forEach((t,i)=>{t.a='A'+i;t.b='B'+i});c.draw=c.teams.map(t=>t.id);c.confirmed=true;comp.categories=[c];return {comp,c};}
+function fixture(n=18){const comp=A.fresh();comp.created=true;comp.courts=3;const c=A.category('Categoria',n);c.routingVersion=1;c.teams.forEach((t,i)=>{t.a='A'+i;t.b='B'+i});c.draw=c.teams.map(t=>t.id);c.confirmed=true;comp.categories=[c];return {comp,c};}
 const finish=(comp,c,id,score=[18,10])=>A.mutate(comp,c,id,{status:'done',court:1,score});
 function completed(){const f=fixture();for(const g of A.models[18].games)finish(f.comp,f.c,g.id);return f;}
 test('Corrigir placar com mesmo vencedor preserva todos os outros resultados',()=>{const {comp,c}=completed(),before=JSON.stringify(c.results);const impact=A.previewChange(comp,c,1,{status:'done',court:1,score:[21,19]});assert.deepEqual(impact.conflicts,[]);assert.equal(impact.preserved,33);assert.equal(JSON.stringify(c.results),before,'prévia não altera nada');const saved=JSON.parse(before);finish(comp,c,1,[21,19]);for(const [id,r]of Object.entries(saved))if(+id!==1)assert.deepEqual(c.results[id],r);assert.ok(Object.values(A.resolve(c)).every(g=>g.done));assert.doesNotThrow(()=>A.validate(comp));});
