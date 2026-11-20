@@ -1,2 +1,2 @@
-Roteirizze Torneios 6.0.0
-Tabelas completas de 6 a 32 duplas, incluindo 25, 26, 27, 29 e 31.
+Roteirizze Torneios 6.1.0
+Caminhos fixos antecipados e liberação por partida, sem espera pelo bloco.

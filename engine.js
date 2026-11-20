@@ -26,20 +26,14 @@ const isFixed=c=>c.bracketMode==='fixed';
 function blocks(c){const out=[];for(const g of [...models[c.count].games].sort((a,b)=>a.id-b.id)){const side=['B','F'].includes(g.side)?'D':g.side;let block=out[out.length-1];if(!block||block.side!==side){block={side,ids:[]};out.push(block);}block.ids.push(g.id);}return out;}
 function previousGames(c,id){const sequence=blocks(c),index=sequence.findIndex(b=>b.ids.includes(id));return sequence.slice(0,index).flatMap(b=>b.ids);}
 const modern=c=>isFixed(c)&&c.routingVersion===2;
-function layoutGraph(c){const semis=models[c.count].games.filter(g=>g.side==='S');return models[c.count].games.map(g=>({...g,refs:isFixed(c)?(g.side==='S'&&c.semifinalCrossed?[g.refs[0],semis.find(x=>x.id!==g.id).refs[1]]:modern(c)&&g.side==='L'?(c.crossingRoutes?.[g.id]||g.refs):g.refs):g.side==='L'?(c.routes[g.id]||['R','R']):g.side==='S'?(c.routes[g.id]||[g.refs[0],'Q']):g.refs}));}
-function graph(c){return layoutGraph(c).map(g=>modern(c)&&g.side==='L'&&!c.crossingRoutes?.[g.id]?{...g,refs:['R','R']}:g);}
+function layoutGraph(c){const semis=models[c.count].games.filter(g=>g.side==='S'),routes=modern(c)?Crossing.fixedRoutes(models[c.count].games,c.crossingRoutes||{}):null;return models[c.count].games.map(g=>({...g,refs:isFixed(c)?(g.side==='S'&&c.semifinalCrossed?[g.refs[0],semis.find(x=>x.id!==g.id).refs[1]]:modern(c)&&g.side==='L'?routes[g.id]:g.refs):g.side==='L'?(c.routes[g.id]||['R','R']):g.side==='S'?(c.routes[g.id]||[g.refs[0],'Q']):g.refs}));}
+function graph(c){return layoutGraph(c);}
 function planCrossings(c){
  if(!c.confirmed||!modern(c))return;
- const defs=models[c.count].games,half=halves(c).teams;
- for(const group of Crossing.batches(defs)){
-  if(group.every(g=>c.crossingRoutes[g.id]))continue;
-  const resolved=resolve(c);if(Object.values(resolved).some(g=>g.conflict))return;
-  const refs=group.flatMap(g=>g.refs),tickets=refs.map(ref=>{const g=resolved[+ref.slice(1)];return g?.done?{ref,team:ref[0]==='P'?g.loser:g.winner}:null;});
-  if(tickets.some(t=>!t))continue;
-  const history=Object.values(resolved).filter(g=>g.done&&['W','L'].includes(g.side)),chosen=Crossing.choose(group,tickets,history,half);
-  group.forEach((g,i)=>c.crossingRoutes[g.id]=chosen.pairs[i]);
- }
- const proposal=semifinalProposal(c);if(proposal.available)c.semifinalCrossed=!c.semifinalCrossed;
+ const routes=Crossing.fixedRoutes(models[c.count].games,c.crossingRoutes||{});
+ c.crossingRoutes=Object.fromEntries(Object.entries(routes).map(([id,refs])=>[id,[...refs]]));
+ // A visible path must never be changed automatically after later scores.
+ // Preserve an existing semifinalCrossed value from an earlier version.
 }
 
 function order(c){const defs=graph(c),pending=[...defs],done=new Set(),out=[];while(pending.length){let changed=false;for(let i=0;i<pending.length;){const g=pending[i];if(g.refs.every(r=>!['V','P'].includes(r[0])||done.has(+r.slice(1)))){out.push(g);done.add(g.id);pending.splice(i,1);changed=true;}else i++;}if(!changed)throw Error('Cruzamento inválido ou circular.');}return out;}
@@ -114,7 +108,7 @@ function prepareChange(comp,c,id,result){
 }
 function previewChange(comp,c,id,result){const {candidate,...impact}=prepareChange(comp,c,id,result);return impact;}
 function mutate(comp,c,id,result){const change=prepareChange(comp,c,id,result);Object.assign(c,change.candidate);return c;}
-function assign(comp,c,id,court){const m=resolve(c)[id];if(m?.status!=='ready')throw Error('Escolha um jogo pronto.');if(!Number.isInteger(court)||court<1||court>comp.courts)throw Error('Quadra inválida.');c.results[id]={status:'queued',court,participants:[...m.teams]};}
+function assign(comp,c,id,court){const m=resolve(c)[id];if(m?.status!=='ready')throw Error('Escolha um jogo pronto.');if(!Number.isInteger(court)||court<1||court>comp.courts)throw Error('Quadra inválida.');c.results[id]={status:'queued',court,participants:[...m.teams]};if(modern(c))planCrossings(c);}
 function competitionState(comp){const categories=comp.categories||[];if(!categories.length||!categories.some(c=>c.confirmed))return 'preparation';return categories.every(c=>Object.values(resolve(c)).every(g=>g.done))?'finished':'active';}
 function redrawCategory(c,confirmation){
  if(String(confirmation).trim()!=='SORTEAR')throw Error('Digite SORTEAR para confirmar.');

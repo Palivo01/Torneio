@@ -94,3 +94,8 @@
 
 /* A navegação move apenas uma camada composta, sem redimensionar a tabela. */
 .championship-scroll{position:relative;overflow:hidden!important;touch-action:none;-webkit-overflow-scrolling:auto;overflow-anchor:none}.bracket-surface{position:absolute;inset:0;width:100%!important;height:100%!important;overflow:hidden;contain:layout paint}.bracket-scale{left:0;top:0;transform-origin:0 0;will-change:transform;transition:none!important}.bracket-scale .match{touch-action:none}.championship-scroll *{-webkit-user-drag:none}
+
+/* Pending routes expose the eligible source games without promising a fixed pairing. */
+.origin-options{display:block;font-size:12px;line-height:1.35;color:var(--muted);margin-top:4px;font-weight:400}.team-row.pending>span{overflow-wrap:anywhere}.bracket-node .origin-options{font-size:11px}.match-footer{flex-wrap:wrap;gap:5px}.match-footer>span{overflow-wrap:anywhere}
+
+.match-destinations{margin:7px 0 0;padding-top:6px;border-top:1px solid var(--line);font-size:12px;line-height:1.4;color:var(--cyan);overflow-wrap:anywhere}.bracket-node .match-destinations{font-size:11px}@media print{.match-destinations{color:#173247}}

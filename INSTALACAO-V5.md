@@ -1,3 +1,13 @@
+# Atualização 6.1.0
+
+Leia `ATUALIZACAO-6.1.0.txt`. Caminhos fixos e liberação independente de cada partida. Rotas já gravadas, sorteios e resultados são preservados. Não há SQL adicional à base 6.0. Publique todo o pacote e recarregue todos os operadores.
+
+As instruções abaixo são históricas; a espera para definir cruzamentos por etapa foi substituída.
+
+# Atualização 6.0.1
+
+Leia `ATUALIZACAO-6.0.1.txt`. Correção visual compatível com competições em andamento na 6.0.0. Não há SQL novo nem necessidade de sortear novamente. Publique o pacote completo e recarregue as páginas após o deploy.
+
 # Atualização 6.0.0
 
 Leia `ATUALIZACAO-6.0.0.txt`. A versão inclui todas as tabelas de 6 a 32 duplas. Se o SQL 005 da 5.3.0 já foi executado, não há SQL adicional. Se ainda usa 5.2.4, execute `supabase/005_v53_crossings.sql` antes de publicar. Sorteios e resultados existentes permanecem preservados.

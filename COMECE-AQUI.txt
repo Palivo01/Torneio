@@ -1,3 +1,99 @@
+ROTEIRIZZE TORNEIOS 6.1.0
+
+CORREÇÃO DA ESPERA POR BLOCO
+A 6.0.1 mostrava possibilidades, mas ainda aguardava todos os classificados de
+uma etapa para escolher seus confrontos. A 6.1.0 corrige a lógica: os caminhos
+ficam definidos antecipadamente e cada partida libera assim que suas duas
+origens terminarem, sem depender de jogos independentes do mesmo bloco.
+O nome conhecido já aparece na vaga do próximo jogo mesmo que o adversário
+continue identificado como Perdedor do J6 ou Vencedor do J5.
+Os cartões informam também os destinos: Vence: J7 / Perde: J6, por exemplo.
+As referências exatas e as conexões também aparecem na impressão.
+
+CRUZAMENTOS COM CAMINHO FIXO
+Os cruzamentos são escolhidos pela estrutura das origens, antes dos placares,
+preferindo caminhos com menor sobreposição para adiar reencontros. Não dependem
+de aguardar resultados para reorganizar a tabela. A chave dos vencedores,
+a quantidade de jogos, os números e as entradas dos biônicos não mudaram.
+As semifinais não são mais trocadas automaticamente por resultados posteriores:
+um caminho anunciado deve permanecer o mesmo. Um cruzamento de semifinal já
+salvo em versões anteriores é preservado. Não há promessa de ausência de
+reencontros em todo cenário e em toda quantidade de duplas.
+
+COMPETIÇÕES EM ANDAMENTO
+Todos os cruzamentos já gravados, inclusive de partidas ainda não iniciadas,
+são preservados. Apenas os caminhos que ainda não tinham sido definidos são
+completados. Sorteio, IDs das duplas, nomes, quadras e placares são mantidos.
+Os novos caminhos aparecem ao carregar a página e são gravados junto ao próximo
+salvamento normal da competição. Não há recálculo nem alteração de resultados.
+Não use Sortear novamente, Zerar ou importar backup para instalar esta correção.
+
+PUBLICAÇÃO
+Para quem já usa 6.0.0 ou 6.0.1 funcionando, não existe SQL novo.
+1. Faça uma pausa breve nos lançamentos. Exportar backup é opcional, como cópia
+   de segurança; não é necessário importar nada para atualizar.
+2. Publique todo o conteúdo de Torneio-main na raiz servida da hospedagem.
+   Inclua todos os HTML, scripts, styles.css, assets e vendor. A pasta supabase
+   não precisa ser publicada. Não há build nem instalação de dependências.
+3. Aguarde o deploy, feche as abas antigas dos operadores e recarregue as páginas
+   em todos os aparelhos (Ctrl+Shift+R no computador). Confira v6.1.0 no rodapé.
+4. Confira os placares já lançados e retome a competição normalmente.
+Se ainda não instalou a base 5.3/6.0, o SQL 005 anterior continua necessário;
+esta entrega não acrescenta nem modifica o SQL.
+
+VALIDAÇÃO
+179 testes JavaScript aprovados, incluindo torneios completos em todas as 27
+quantidades disponíveis e caminhos estáveis com ordens variadas de lançamento.
+O caso KIDS foi reproduzido: J6 libera após J1 e J2, com J3 e J4 ainda pendentes,
+e recebe os perdedores imediatamente após cada resultado.
+Foram verificadas todas as 1.024 combinações de resultados anteriores às
+semifinais da tabela de 8 duplas, sem reencontros na repescagem nesse modelo novo.
+Doze snapshots fictícios da 6.0.1 conservaram todos os caminhos já anunciados,
+participantes e resultados. Histórico com semifinal cruzada também preservado.
+No navegador, J6 foi iniciado com J4 ainda pendente. Tabela de 32 duplas conferida
+sem cartões sobrepostos. Todos os testes utilizaram dados fictícios locais.
+Nenhum arquivo foi publicado no seu GitHub nem dado alterado no Supabase real.
+
+
+HISTÓRICO DAS VERSÕES ANTERIORES (A ESPERA DINÂMICA POR ETAPA FOI SUBSTITUÍDA)
+
+ROTEIRIZZE TORNEIOS 6.0.1
+
+CORREÇÃO VISUAL DAS ORIGENS NA REPESCAGEM
+Os jogos da repescagem ainda sem cruzamento definido mostram as origens possíveis,
+como V5 ou V6 contra P7 ou P8, em vez de apenas Aguardando cruzamento.
+P significa perdedor e V significa vencedor do jogo indicado. Uma sequência como
+P1 a P4 inclui os perdedores dos jogos 1, 2, 3 e 4. Listas com intervalos ausentes
+não são agrupadas como se esses jogos também fossem elegíveis.
+Essas possibilidades não são confrontos fixos. Depois que o cruzamento automático
+é definido, os nomes e referências exatas passam a aparecer normalmente.
+A mesma informação aparece na tabela completa, na lista de jogos e na impressão.
+
+PRESERVAÇÃO
+Correção somente de apresentação. O motor, as tabelas, as regras, o sorteio,
+os cruzamentos definidos, as quadras atribuídas e os resultados foram preservados.
+Nenhuma gravação, migração ou recálculo foi executado no Supabase de produção.
+Não use Sortear novamente nem Zerar para instalar esta correção.
+
+ATUALIZAÇÃO DURANTE A COMPETIÇÃO
+Para quem já usa a 6.0.0 funcionando, não existe SQL novo.
+Faça uma pausa breve nos lançamentos, publique todo o conteúdo de Torneio-main
+na raiz servida e aguarde a conclusão do deploy. Inclua match-origins.js e todos
+os HTML, scripts, styles.css, assets e vendor. A pasta supabase não precisa subir.
+Depois, os operadores devem recarregar as páginas e conferir v6.0.1 no rodapé.
+Não é necessário exportar/importar para aplicar a correção nem refazer o sorteio.
+Se quiser, exporte um backup como cópia de segurança opcional.
+
+VALIDAÇÃO
+171 testes JavaScript aprovados. Novos testes verificam origens possíveis em todas
+as 27 tabelas, transição para referências exatas, exibição no painel e no público,
+impressão e preservação byte a byte dos dados de uma competição com jogo ao vivo.
+Conferência no navegador com tabela de 8 duplas pendente, 8 em andamento e 32 duplas:
+cartões sem sobreposição. Testes e visualização usaram somente dados fictícios.
+
+
+HISTÓRICO DAS VERSÕES ANTERIORES
+
 ROTEIRIZZE TORNEIOS 6.0.0
 
 TABELAS ADICIONADAS

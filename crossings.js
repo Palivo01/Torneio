@@ -20,5 +20,42 @@ function choose(slots,tickets,history,half){
  const best=solve(0,0);if(!best)throw Error('Não foi possível cruzar os classificados.');
  return {rematches:best.cost[0],pairs:best.pairs.map((pair,i)=>slots[i].refs[0][0]===pair[0][0]?pair:[pair[1],pair[0]])};
 }
-const api={batches,choose};if(typeof module!=='undefined')module.exports=api;else root.BracketCrossings=api;
+// Complete the bracket BEFORE scores exist. Pair source tickets using their
+// possible entry slots, preferring disjoint paths to postpone rematches.
+// Saved routes always take precedence, including a tournament already underway.
+const fixedCache=new Map();
+function fixedRoutes(games,saved={}){
+ const groups=batches(games),all=groups.flat();if(all.every(g=>saved[g.id]))return saved;
+ const key=JSON.stringify([games,saved]);if(fixedCache.has(key))return fixedCache.get(key);
+ const routes=Object.fromEntries(Object.entries(saved).map(([id,refs])=>[id,[...refs]])),byId=Object.fromEntries(games.map(g=>[g.id,g]));
+ function slots(ref,memo=new Map()){
+  if(memo.has(ref))return memo.get(ref);
+  if(ref[0]==='T')return new Set([+ref.slice(1)]);
+  const g=byId[+ref.slice(1)];if(!g)throw Error('Origem de cruzamento inválida.');
+  const out=new Set((routes[g.id]||g.refs).flatMap(r=>[...slots(r,memo)]));memo.set(ref,out);return out;
+ }
+ for(const group of groups){
+  if(group.every(g=>routes[g.id]))continue;
+  if(group.some(g=>routes[g.id]))throw Error('Etapa de cruzamento incompleta.');
+  const refs=group.flatMap(g=>g.refs),sets=refs.map(r=>slots(r)),full=(1<<refs.length)-1,memo=new Map();
+  const cost=(i,j,index)=>{
+   const common=[...sets[i]].filter(n=>sets[j].has(n)).length;
+   return [common/(sets[i].size*sets[j].size),Number(!group[index].refs.includes(refs[i]))+Number(!group[index].refs.includes(refs[j]))];
+  };
+  function solve(mask,index){
+   if(mask===full)return {risk:0,moves:0,pairs:[]};if(memo.has(mask))return memo.get(mask);
+   const types=group[index].refs.map(r=>r[0]).sort().join('');let best=null;
+   for(let i=0;i<refs.length;i++){if(mask&(1<<i))continue;for(let j=i+1;j<refs.length;j++){
+    if(mask&(1<<j)||[refs[i][0],refs[j][0]].sort().join('')!==types)continue;
+    const next=solve(mask|(1<<i)|(1<<j),index+1);if(!next)continue;const [risk,moves]=cost(i,j,index),candidate={risk:risk+next.risk,moves:moves+next.moves,pairs:[[refs[i],refs[j]],...next.pairs]};
+    if(!best||candidate.risk<best.risk-1e-12||Math.abs(candidate.risk-best.risk)<1e-12&&candidate.moves<best.moves)best=candidate;
+   }if(types[0]===types[1]&&group.slice(index).every(g=>g.refs.every(r=>r[0]===types[0])))break;}
+   memo.set(mask,best);return best;
+  }
+  const result=solve(0,0);if(!result)throw Error('Não foi possível definir os caminhos da repescagem.');
+  group.forEach((g,i)=>{const pair=result.pairs[i];routes[g.id]=pair[0][0]===g.refs[0][0]?pair:[pair[1],pair[0]];});
+ }
+ fixedCache.set(key,routes);if(fixedCache.size>128)fixedCache.delete(fixedCache.keys().next().value);return routes;
+}
+const api={batches,choose,fixedRoutes};if(typeof module!=='undefined')module.exports=api;else root.BracketCrossings=api;
 })(typeof window!=='undefined'?window:globalThis);
